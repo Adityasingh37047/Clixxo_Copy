@@ -1,0 +1,102 @@
+import React, { useState } from 'react';
+import {
+  PING_TITLE,
+  PING_LABELS,
+  PING_SOURCE_OPTIONS,
+  PING_BUTTONS,
+} from '../constants/PINGTestConstants';
+import Button from '@mui/material/Button';
+
+const blueBar = (title) => (
+  <div className="w-full bg-gradient-to-b from-[#b3e0ff] via-[#7ecbfa] to-[#3b8fd6] h-12 rounded-t-lg flex items-center justify-center text-[22px] font-semibold text-gray-800 shadow mb-0 border-b border-[#b3e0ff]">
+    {title}
+  </div>
+);
+
+const buttonSx = {
+  background: 'linear-gradient(to bottom, #5dc6f8 0%, #299fd6 100%)',
+  color: '#fff',
+  fontWeight: 600,
+  fontSize: '16px',
+  borderRadius: 0,
+  minWidth: 90,
+  px: 2,
+  py: 0.5,
+  boxShadow: '0 2px 8px #b3e0ff',
+  textTransform: 'none',
+  '&:hover': {
+    background: 'linear-gradient(to bottom, #299fd6 0%, #5dc6f8 100%)',
+  },
+};
+
+const PINGTest = () => {
+  const [sourceIp, setSourceIp] = useState(PING_SOURCE_OPTIONS[0].value);
+  const [destIp, setDestIp] = useState('');
+  const [count, setCount] = useState('');
+  const [length, setLength] = useState('');
+  const [info, setInfo] = useState('');
+
+  return (
+    <div className="w-full min-h-screen bg-white flex flex-col items-center py-6 px-2">
+      <div className="w-full max-w-4xl">
+        {blueBar(PING_TITLE)}
+        <div className="border border-gray-400 rounded-b-lg bg-white p-8 flex flex-col items-center">
+          {/* Form Row */}
+          <form className="w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 items-center mb-8">
+            <label className="text-[17px] text-gray-700 text-left">{PING_LABELS.sourceIp}</label>
+            <select
+              className="border border-gray-400 rounded px-2 py-1 text-base text-gray-800 bg-white min-w-[220px]"
+              value={sourceIp}
+              onChange={e => setSourceIp(e.target.value)}
+            >
+              {PING_SOURCE_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+
+            <label className="text-[17px] text-gray-700 text-left">{PING_LABELS.destIp}</label>
+            <input
+              type="text"
+              className="border border-gray-400 rounded px-2 py-1 text-base text-gray-800 bg-white min-w-[220px]"
+              value={destIp}
+              onChange={e => setDestIp(e.target.value)}
+            />
+
+            <label className="text-[17px] text-gray-700 text-left">{PING_LABELS.count}</label>
+            <input
+              type="number"
+              className="border border-gray-400 rounded px-2 py-1 text-base text-gray-800 bg-white min-w-[220px]"
+              value={count}
+              onChange={e => setCount(e.target.value)}
+            />
+
+            <label className="text-[17px] text-gray-700 text-left">{PING_LABELS.length}</label>
+            <input
+              type="number"
+              className="border border-gray-400 rounded px-2 py-1 text-base text-gray-800 bg-white min-w-[220px]"
+              value={length}
+              onChange={e => setLength(e.target.value)}
+            />
+          </form>
+          {/* Buttons Row */}
+          <div className="w-full flex flex-row justify-center gap-12 mb-8">
+            <Button variant="contained" sx={buttonSx}>{PING_BUTTONS.start}</Button>
+            <Button variant="contained" sx={buttonSx}>{PING_BUTTONS.end}</Button>
+          </div>
+          {/* Info Section */}
+          <div className="w-full flex flex-col md:flex-row md:items-start gap-4">
+            <label className="text-[17px] text-gray-700 min-w-[80px] md:pt-2">{PING_LABELS.info}</label>
+            <textarea
+              className="w-full min-h-[180px] max-h-[320px] border border-gray-400 rounded bg-white text-[16px] p-2 font-mono resize-y"
+              value={info}
+              onChange={e => setInfo(e.target.value)}
+              placeholder=""
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PINGTest; 

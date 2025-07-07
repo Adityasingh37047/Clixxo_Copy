@@ -1,0 +1,17 @@
+export const PCM_PSTN_FIELDS = [
+  { key: 'interface', label: 'Interface', type: 'select', options: ['E1', 'Other'] },
+  { key: 'encodingFormat', label: 'Encoding Format', type: 'select', options: ['A-law', 'Mu-law'] },
+  { key: 'echoCanceller', label: 'Echo Canceller', type: 'checkbox' },
+  { key: 'busyToneDetection', label: 'Busy Tone Detection', type: 'checkbox' },
+  { key: 'ringbackTone', label: 'Ringback Tone', type: 'select', options: ['No Ringback Tone', 'Option 1', 'Option 2'] },
+  { key: 'pstnCallBarring', label: 'PSTN Call Barring', type: 'checkbox' },
+  { key: 'isdnProgressIndicator', label: 'ISDN 01 Message Contains Progress Indicator', type: 'text' },
+  { key: 'ringbackToneVolume', label: 'Ringback Tone Volume (dB)', type: 'text' },
+  { key: 'pstnOutputLevelControlMode', label: 'PSTN side output Level Control Mode', type: 'select', options: ['Manual', 'Auto'] },
+  { key: 'voiceGainOutput', label: 'Voice Gain Output from PSTN (dB)', type: 'text' },
+  { key: 'uuiProtocolDiscriminator', label: 'UUI Protocol Discriminator', type: 'checkbox' },
+  { key: 'hotBackupE1', label: 'Hot Back-up for E1', type: 'checkbox' },
+  { key: 'limitedLengthCalleeId', label: 'Limited Length of E1 Outgoing CalleeID', type: 'text' },
+  { key: 'timeLimitOutgoingCalls', label: 'Time Limit for E1 Outgoing Calls per Month', type: 'checkbox' },
+  { key: 'pstnCallForwarding', label: 'PSTN Call Forwarding', type: 'select', options: ['Disable', 'Enable'] },
+];

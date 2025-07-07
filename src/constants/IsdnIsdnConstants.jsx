@@ -1,0 +1,76 @@
+// ISDN ISDN Page Constants
+
+export const ISDN_FORM_FIELDS = [
+  // Top row fields
+  { name: 'linkNo', label: 'Link No.', type: 'text', section: 'top' },
+  { name: 'logicalPcmNo', label: 'Logical PCM No.', type: 'text', section: 'top' },
+  { name: 'tei', label: 'TEI', type: 'text', section: 'top' },
+  { name: 'chIdentification', label: 'Ch Identification', type: 'select', section: 'top', options: ['Number'] },
+  { name: 'defaultCalleeType', label: 'Default Callee Type', type: 'select', section: 'top', options: ['National number (0XA1)'] },
+  { name: 'defaultCallerType', label: 'Default Caller Type', type: 'select', section: 'top', options: ['National number (0X21)'] },
+  { name: 'codec', label: 'CODEC', type: 'select', section: 'top', options: ['A-Law'] },
+  { name: 'autoLinkBuilding', label: 'Auto Link Building', type: 'select', section: 'top', options: ['Enable', 'Disable'] },
+  { name: 'crcCheck', label: 'CRC Check', type: 'checkbox', section: 'top' },
+  { name: 'synchronizeModification', label: 'Synchronize Modification', type: 'checkbox', section: 'top' },
+
+  // ISDN Global Settings
+  { name: 'transferCapability', label: 'Transfer Capability', type: 'select', section: 'global', options: ['Voice'] },
+  { name: 'enterAutoAlertCallProceeding', label: 'Enter Auto Alert State upon Reception of CALL PROCEEDING Message', type: 'checkbox', section: 'global' },
+  { name: 'enterAutoAlertProgress', label: 'Enter Auto Alert State upon Reception of PROGRESS Message', type: 'checkbox', section: 'global' },
+  { name: 'decodeIsdnDebug', label: 'Decode ISDN Debugging Message before Outputting', type: 'checkbox', section: 'global' },
+  { name: 'maxWaitTime', label: 'Maximum Wait Time for Called Party\'s Pick up(s)', type: 'text', section: 'global' },
+  { name: 'minCalleeLength', label: 'Minimum Length of the CalleeID of an Incoming Call', type: 'text', section: 'global' },
+  { name: 'callingPartyPresent', label: 'Calling Party Property Present Indicator', type: 'select', section: 'global', options: ['Allowed to present(00)'] },
+  { name: 'callingPartyShielding', label: 'Calling Party Property Shielding Indicator', type: 'select', section: 'global', options: ['Provided by users, checked a'] },
+  { name: 'defaultRedirectingType', label: 'Default Redirecting Number Type', type: 'select', section: 'global', options: ['National number(0X21)'] },
+  { name: 'collectCall', label: 'Collect Call', type: 'select', section: 'global', options: ['Default'] },
+
+  // ISDN User Side
+  { name: 'userSendCalledPartyNumberComplete', label: "Send the 'Called Party Number Complete' Parameter", type: 'checkbox', section: 'user' },
+  { name: 'userSendChannelIdentification', label: 'Send Channel Identification Message', type: 'checkbox', section: 'user' },
+  { name: 'userWaitConfirmTime', label: 'Wait Confirm Time (T310) (s)', type: 'text', section: 'user' },
+  { name: 'userSetCauseValueLength', label: 'Set Cause Value Length to 2 bytes', type: 'checkbox', section: 'user' },
+  { name: 'userAllowPreferentialChannel', label: 'Allow the Preferential Channel Selection', type: 'checkbox', section: 'user' },
+
+  // ISDN Network Side
+  { name: 'networkSendCalledPartyNumberComplete', label: "Send the 'Called Party Number Complete' Parameter", type: 'checkbox', section: 'network' },
+  { name: 'networkSendChannelIdentification', label: 'Send Channel Identification Message', type: 'checkbox', section: 'network' },
+  { name: 'networkWaitConfirmTime', label: 'Wait Confirm Time (T310) (s)', type: 'text', section: 'network' },
+  { name: 'networkSetCauseValueLength', label: 'Set Cause Value Length to 2 bytes', type: 'checkbox', section: 'network' },
+  { name: 'networkAllowPreferentialChannel', label: 'Allow the Preferential Channel Selection', type: 'checkbox', section: 'network' },
+  { name: 'networkEnable', label: 'Enable', type: 'checkbox', section: 'network' },
+];
+
+export const ISDN_FORM_INITIAL_VALUES = {
+  linkNo: '',
+  logicalPcmNo: '',
+  tei: '',
+  chIdentification: 'Number',
+  defaultCalleeType: 'National number (0XA1)',
+  defaultCallerType: 'National number (0X21)',
+  codec: 'A-Law',
+  autoLinkBuilding: 'Enable',
+  crcCheck: false,
+  synchronizeModification: false,
+  transferCapability: 'Voice',
+  enterAutoAlertCallProceeding: false,
+  enterAutoAlertProgress: false,
+  decodeIsdnDebug: false,
+  maxWaitTime: '',
+  minCalleeLength: '',
+  callingPartyPresent: 'Allowed to present(00)',
+  callingPartyShielding: 'Provided by users, checked a',
+  defaultRedirectingType: 'National number(0X21)',
+  collectCall: 'Default',
+  userSendCalledPartyNumberComplete: false,
+  userSendChannelIdentification: false,
+  userWaitConfirmTime: '',
+  userSetCauseValueLength: false,
+  userAllowPreferentialChannel: false,
+  networkSendCalledPartyNumberComplete: false,
+  networkSendChannelIdentification: false,
+  networkWaitConfirmTime: '',
+  networkSetCauseValueLength: false,
+  networkAllowPreferentialChannel: false,
+  networkEnable: false,
+};
