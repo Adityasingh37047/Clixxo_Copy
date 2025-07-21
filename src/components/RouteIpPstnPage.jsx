@@ -5,6 +5,8 @@ import {
   ROUTE_IP_PSTN_TABLE_COLUMNS
 } from '../constants/RouteIPtoPstnConstants';
 import { FaPencilAlt } from 'react-icons/fa';
+import { Button, Checkbox, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select as MuiSelect, MenuItem, FormControl } from '@mui/material';
+import EditDocumentIcon from '@mui/icons-material/EditDocument';
 
 const LOCAL_STORAGE_KEY = 'routeIpPstnRules';
 
@@ -37,18 +39,6 @@ const paginationButtonStyle = {
 };
 const pageSelectStyle = {
   fontSize: 13, padding: '2px 6px', borderRadius: 3, border: '1px solid #bbb', background: '#fff',
-};
-const customScrollbarRowStyle = {
-  width: '100%', margin: '0 auto', background: '#f4f6fa', display: 'flex', alignItems: 'center', height: 24, borderBottomLeftRadius: 8, borderBottomRightRadius: 8, border: '2px solid #888', borderTop: 'none', padding: '0 4px', boxSizing: 'border-box',
-};
-const customScrollbarTrackStyle = {
-  flex: 1, height: 12, background: '#e3e7ef', borderRadius: 8, position: 'relative', margin: '0 4px', overflow: 'hidden',
-};
-const customScrollbarThumbStyle = {
-  position: 'absolute', height: 12, background: '#888', borderRadius: 8, cursor: 'pointer', top: 0,
-};
-const customScrollbarArrowStyle = {
-  width: 18, height: 18, background: '#e3e7ef', border: '1px solid #bbb', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#888', cursor: 'pointer', userSelect: 'none',
 };
 const modalOverlayStyle = {
   position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -84,18 +74,12 @@ const modalButtonGrayStyle = {
 const RouteIpPstnPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(ROUTE_IP_PSTN_INITIAL_FORM);
-  const [rules, setRules] = useState(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [rules, setRules] = useState([]);
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 20;
   const totalPages = Math.max(1, Math.ceil(rules.length / itemsPerPage));
   const pagedRules = rules.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-
-  const tableScrollRef = useRef(null);
-  const [scrollState, setScrollState] = useState({ left: 0, width: 0, scrollWidth: 0 });
 
   const handleOpenModal = (item = null, index = -1) => {
     setFormData(item ? { ...item, originalIndex: index } : ROUTE_IP_PSTN_INITIAL_FORM);
@@ -140,29 +124,6 @@ const RouteIpPstnPage = () => {
     setPage(1);
   };
 
-  const handleTableScroll = (e) => setScrollState({ left: e.target.scrollLeft, width: e.target.clientWidth, scrollWidth: e.target.scrollWidth });
-  const handleScrollbarDrag = (e) => {
-    const track = e.target.parentNode;
-    if (!track) return;
-    const rect = track.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percent = Math.max(0, Math.min(1, x / rect.width));
-    if (tableScrollRef.current) tableScrollRef.current.scrollLeft = (scrollState.scrollWidth - scrollState.width) * percent;
-  };
-  const handleArrowClick = (dir) => {
-    if (tableScrollRef.current) tableScrollRef.current.scrollLeft += (dir === 'left' ? -100 : 100);
-  };
-
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(rules));
-  }, [rules]);
-
-  useEffect(() => {
-    if (tableScrollRef.current) {
-        setScrollState({ left: tableScrollRef.current.scrollLeft, width: tableScrollRef.current.clientWidth, scrollWidth: tableScrollRef.current.scrollWidth });
-    }
-  }, [rules, page]);
-
   const rootStyle = { 
     background: '#fff', 
     minHeight: 'calc(100vh - 128px)',
@@ -175,52 +136,65 @@ const RouteIpPstnPage = () => {
     boxSizing: 'border-box'
   };
 
-  const thumbWidth = scrollState.width && scrollState.scrollWidth ? Math.max(40, (scrollState.width / scrollState.scrollWidth) * (scrollState.width - 8)) : 40;
-  const thumbLeft = scrollState.width && scrollState.scrollWidth && scrollState.scrollWidth > scrollState.width ? ((scrollState.left / (scrollState.scrollWidth - scrollState.width)) * (scrollState.width - thumbWidth - 16)) : 0;
-
   return (
     <div style={rootStyle}>
       {rules.length === 0 ? (
-        <div style={{ textAlign: 'center', marginBottom: '50vh' }}>
-          <div style={{ color: '#222', fontSize: 22, marginBottom: 32 }}>No available routing rule!</div>
-          <button
-            style={{
+        <div className="w-full h-full flex flex-col items-center justify-center py-16">
+          <div className="text-gray-800 text-2xl mb-6">No available routing rule!</div>
+          <Button
+            variant="contained"
+            sx={{
               background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
               color: '#fff',
-              fontSize: 16,
-              padding: '7px 32px',
-              border: 'none',
-              borderRadius: 6,
-              boxShadow: '0 2px 4px rgba(0,0,0,0.10)',
-              cursor: 'pointer',
+              fontWeight: 600,
+              fontSize: '18px',
+              borderRadius: 2,
+              minWidth: 140,
+              minHeight: 48,
+              px: 2,
+              py: 0.5,
+              boxShadow: '0 2px 8px #b3e0ff',
+              textTransform: 'none',
+              '&:hover': {
+                background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+                color: '#fff',
+              },
             }}
             onClick={() => handleOpenModal()}
-          >Add New</button>
+          >
+            Add New
+          </Button>
         </div>
       ) : (
-        <div style={{width:'100%'}}>
-            <div style={{ ...tableContainerStyle, borderBottomLeftRadius:0, borderBottomRightRadius:0, borderBottom:'none' }}>
-                <div style={{ ...blueBarStyle, borderBottom: '2px solid #888' }}>IP-&gt;PSTN Routing Rule</div>
-                <div ref={tableScrollRef} onScroll={handleTableScroll} style={{overflowX: 'auto', scrollbarWidth: 'none', '-ms-overflow-style': 'none'}}>
-                    <table style={{...tableStyle, minWidth: (ROUTE_IP_PSTN_TABLE_COLUMNS.length + 2) * 150 }}>
+        <div className="w-full max-w-7xl mx-auto bg-white rounded-lg shadow-sm overflow-hidden">
+          <div style={{ ...blueBarStyle, border: '2px solid #888', borderBottom: 'none', color: '#222', maxWidth: '100%' }}>IP-&gt;PSTN Routing Rule</div>
+          <div style={{ border: '2px solid #888', borderTop: 'none', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, background: '#f8fafd', margin: 0, boxShadow: 'none' }}>
+            <div className="w-full overflow-x-auto">
+              <table className="w-full min-w-[1100px] border-collapse table-auto">
                         <thead>
                             <tr>
-                              <th style={thStyle}><input type="checkbox" checked={selected.length === rules.length && rules.length > 0} onChange={selected.length === rules.length ? handleUncheckAll : handleCheckAll} /></th>
-                              {ROUTE_IP_PSTN_TABLE_COLUMNS.map(c => <th key={c.key} style={thStyle}>{c.label}</th>)}
-                              <th style={thStyle}>Modify</th>
+                    <th className="bg-white text-gray-800 font-semibold text-sm border border-gray-300 px-2 py-1 whitespace-nowrap">Check</th>
+                    {ROUTE_IP_PSTN_TABLE_COLUMNS.map(c => (
+                      <th key={c.key} className="bg-white text-gray-800 font-semibold text-sm border border-gray-300 px-2 py-1 whitespace-nowrap">{c.label}</th>
+                    ))}
+                    <th className="bg-white text-gray-800 font-semibold text-sm border border-gray-300 px-2 py-1 whitespace-nowrap">Modify</th>
                             </tr>
                         </thead>
                         <tbody>
                             {pagedRules.map((item, idx) => {
                                 const realIdx = (page - 1) * itemsPerPage + idx;
                                 return (
-                                <tr key={realIdx}>
-                                    <td style={tdStyle}><input type="checkbox" checked={selected.includes(realIdx)} onChange={() => handleSelectRow(idx)} /></td>
-                                    {ROUTE_IP_PSTN_TABLE_COLUMNS.map(col => <td key={col.key} style={tdStyle}>{item[col.key] || '--'}</td>)}
-                                    <td style={{ ...tdStyle, textAlign: 'center', verticalAlign: 'middle', height: 48 }}>
-                                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                                        <FaPencilAlt style={{ color: '#1976d2', fontSize: 22, cursor: 'pointer' }} onClick={() => handleOpenModal(item, realIdx)} />
-                                      </div>
+                      <tr key={realIdx} style={{ borderBottom: '1px solid #bbb', height: 48 }}>
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">
+                          <Checkbox checked={selected.includes(realIdx)} onChange={() => handleSelectRow(idx)} size="small" />
+                        </td>
+                        {ROUTE_IP_PSTN_TABLE_COLUMNS.map(col => (
+                          <td key={col.key} className="border border-gray-300 px-2 py-1 text-center bg-white">{item[col.key] || '--'}</td>
+                        ))}
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">
+                          <button onClick={() => handleOpenModal(item, realIdx)} className="text-blue-600 hover:text-blue-800">
+                            <EditDocumentIcon fontSize="small" />
+                          </button>
                                     </td>
                                 </tr>
                                 );
@@ -229,67 +203,142 @@ const RouteIpPstnPage = () => {
                     </table>
                 </div>
             </div>
-            <div style={{ ...customScrollbarRowStyle, maxWidth: '100%' }}>
-                <div style={customScrollbarArrowStyle} onClick={() => handleArrowClick('left')}>&#9664;</div>
-                <div style={customScrollbarTrackStyle} onClick={handleScrollbarDrag} >
-                    <div style={{ ...customScrollbarThumbStyle, width: thumbWidth, left: thumbLeft }} draggable onDrag={handleScrollbarDrag} />
-                </div>
-                <div style={customScrollbarArrowStyle} onClick={() => handleArrowClick('right')}>&#9654;</div>
+          <div className="flex flex-wrap items-center justify-between gap-2 w-full max-w-7xl mx-auto bg-gray-200 rounded-lg border border-gray-300 border-t-0 mt-0 p-2">
+            <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleCheckAll}>Check All</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleUncheckAll}>Uncheck All</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleInverse}>Inverse</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleDelete}>Delete</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleClearAll}>Clear All</button>
             </div>
-            <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#e3e7ef', borderRadius: 8, border: '1px solid #bbb', borderTop: 'none', marginTop: 0, padding: '8px 8px 8px 8px' }}>
-                <div style={{ display: 'flex', gap: 8 }}>
-                    <button style={tableButtonStyle} onClick={handleCheckAll}>Check All</button>
-                    <button style={tableButtonStyle} onClick={handleUncheckAll}>Uncheck All</button>
-                    <button style={tableButtonStyle} onClick={handleInverse}>Inverse</button>
-                    <button style={tableButtonStyle} onClick={handleDelete}>Delete</button>
-                    <button style={tableButtonStyle} onClick={handleClearAll}>Clear All</button>
+            <button className="bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white font-semibold text-base rounded px-6 py-2 min-w-[120px] shadow hover:from-[#0e8fd6] hover:to-[#3bb6f5]" onClick={() => handleOpenModal()}>Add New</button>
                 </div>
-                <button style={{ ...addNewButtonStyle, position: 'static', margin: 0 }} onClick={() => handleOpenModal()}>Add New</button>
-            </div>
-            <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', background: '#e3e7ef', borderRadius: 8, border: '1px solid #bbb', borderTop: 'none', marginTop: 4, padding: '2px 8px 2px 8px', display: 'flex', alignItems: 'center', gap: 8, minHeight: 32 }}>
+          <div className="w-full overflow-x-auto">
+            <div className="flex flex-wrap items-center gap-2 w-full max-w-7xl mx-auto bg-gray-200 rounded-lg border border-gray-300 border-t-0 mt-1 p-2 text-sm text-gray-700">
                 <span>{rules.length} items Total</span>
-                <span style={{marginLeft:'8px'}}>{itemsPerPage} Items/Page</span>
-                <span style={{flexGrow: 1}}></span>
+              <span>{itemsPerPage} Items/Page</span>
                 <span>{page}/{totalPages}</span>
-                <button style={paginationButtonStyle} onClick={() => handlePageChange(1)} disabled={page === 1}>First</button>
-                <button style={paginationButtonStyle} onClick={() => handlePageChange(page - 1)} disabled={page === 1}>Previous</button>
-                <button style={paginationButtonStyle} onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>Next</button>
-                <button style={paginationButtonStyle} onClick={() => handlePageChange(totalPages)} disabled={page === totalPages}>Last</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-xs rounded px-3 py-1 min-w-[60px] shadow disabled:bg-gray-100 disabled:text-gray-400" onClick={() => handlePageChange(1)} disabled={page === 1}>First</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-xs rounded px-3 py-1 min-w-[60px] shadow disabled:bg-gray-100 disabled:text-gray-400" onClick={() => handlePageChange(page - 1)} disabled={page === 1}>Previous</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-xs rounded px-3 py-1 min-w-[60px] shadow disabled:bg-gray-100 disabled:text-gray-400" onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>Next</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-xs rounded px-3 py-1 min-w-[60px] shadow disabled:bg-gray-100 disabled:text-gray-400" onClick={() => handlePageChange(totalPages)} disabled={page === totalPages}>Last</button>
                 <span>Go to Page</span>
-                <select style={pageSelectStyle} value={page} onChange={e => handlePageChange(Number(e.target.value))}>
-                    {Array.from({ length: totalPages }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
+              <select className="text-xs rounded border border-gray-300 px-2 py-1 min-w-[48px]" value={page} onChange={e => handlePageChange(Number(e.target.value))}>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>{i + 1}</option>
+                ))}
                 </select>
                 <span>{totalPages} Pages Total</span>
+            </div>
             </div>
         </div>
       )}
 
       {isModalOpen && (
-        <div style={modalOverlayStyle}>
-          <div style={modalStyle}>
-            <div style={modalHeaderStyle}>IP-&gt;PSTN Routing Rule</div>
-            <div style={modalBodyStyle}>
-              {ROUTE_IP_PSTN_FIELDS.map((field) => (
-                <div key={field.key} style={modalRowStyle}>
-                  <label style={modalLabelStyle}>{field.label}</label>
-                  <div style={{flex: 1}}>
+        <Dialog 
+          open={isModalOpen} 
+          onClose={handleCloseModal}
+          maxWidth={false}
+          className="z-50"
+          PaperProps={{
+            sx: { width: 440, maxWidth: '95vw', mx: 'auto', p: 0 }
+          }}
+        >
+          <DialogTitle className="bg-gradient-to-b from-gray-800 to-gray-600 text-white text-center font-semibold p-2 text-base">
+            IP-&gt;PSTN Routing Rule
+          </DialogTitle>
+          <DialogContent className="pt-3 pb-0 px-2" style={{padding: '12px 8px 0 8px'}}>
+            <div className="flex flex-col gap-2 w-full">
+              {ROUTE_IP_PSTN_FIELDS.map(field => (
+                <div
+                  key={field.key}
+                  className="flex items-center bg-gray-50 border border-gray-200 rounded px-2 py-1 gap-2"
+                  style={{ minHeight: 32 }}
+                >
+                  <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left" style={{width:160, marginRight:10}}>
+                    {field.label}
+                  </label>
+                  <div className="flex-1">
                     {field.type === 'select' ? (
-                      <select name={field.key} value={formData[field.key] || ''} onChange={handleInputChange} style={modalInputStyle}>
-                        {field.options.map((option) => <option key={option} value={option}>{option}</option>)}
-                      </select>
+                      <FormControl fullWidth size="small">
+                        <MuiSelect
+                          value={formData[field.key] || ''}
+                          onChange={e => setFormData(prev => ({ ...prev, [field.key]: e.target.value }))}
+                          size="small"
+                          fullWidth
+                          variant="outlined"
+                          sx={{ fontSize: 14 }}
+                        >
+                          {field.options.map(opt => (
+                            <MenuItem key={opt} value={opt} sx={{ fontSize: 14 }}>{opt}</MenuItem>
+                          ))}
+                        </MuiSelect>
+                      </FormControl>
                     ) : (
-                      <input type={field.type} name={field.key} value={formData[field.key] || ''} onChange={handleInputChange} style={modalInputStyle} />
+                      <TextField
+                        type={field.type}
+                        value={formData[field.key] || ''}
+                        onChange={e => setFormData(prev => ({ ...prev, [field.key]: e.target.value }))}
+                        size="small"
+                        fullWidth
+                        variant="outlined"
+                        inputProps={{ style: { fontSize: 14, padding: '3px 6px' } }}
+                      />
                     )}
                   </div>
                 </div>
               ))}
             </div>
-            <div style={modalFooterStyle}>
-              <button onClick={handleSave} style={modalButtonStyle}>Save</button>
-              <button onClick={handleCloseModal} style={modalButtonGrayStyle}>Close</button>
-            </div>
-          </div>
-        </div>
+          </DialogContent>
+          <DialogActions className="p-4 justify-center gap-6">
+            <Button
+              variant="contained"
+              sx={{
+                background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '16px',
+                borderRadius: 2,
+                minWidth: 120,
+                minHeight: 40,
+                px: 2,
+                py: 0.5,
+                boxShadow: '0 2px 8px #b3e0ff',
+                textTransform: 'none',
+                '&:hover': {
+                  background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+                  color: '#fff',
+                },
+              }}
+              onClick={handleSave}
+            >
+              Save
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
+                color: '#fff',
+                fontWeight: 600,
+                fontSize: '16px',
+                borderRadius: 2,
+                minWidth: 120,
+                minHeight: 40,
+                px: 2,
+                py: 0.5,
+                boxShadow: '0 2px 8px #b3e0ff',
+                textTransform: 'none',
+                '&:hover': {
+                  background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+                  color: '#fff',
+                },
+              }}
+              onClick={handleCloseModal}
+            >
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       )}
   </div>
   );

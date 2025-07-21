@@ -15,13 +15,13 @@ export const BLACKLIST_CALLEE_TABLE_COLUMNS = [
 ];
 
 export const BLACKLIST_INITIAL_FORM = {
-  groupNo: '',
+  groupNo: '1',
   noInGroup: '',
   callerId: '',
 };
 
 export const BLACKLIST_CALLEE_INITIAL_FORM = {
-  groupNo: '',
+  groupNo: '1',
   noInGroup: '',
   calleeId: '',
 };

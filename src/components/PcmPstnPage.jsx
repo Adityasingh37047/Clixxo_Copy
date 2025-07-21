@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
-import { PCM_PSTN_FIELDS } from '../constants/PcmPstnConstants'
+import React, { useState } from 'react';
+import { PCM_PSTN_FIELDS } from '../constants/PcmPstnConstants';
+import { TextField, Select, MenuItem, Checkbox, Button, FormControl, InputLabel, FormControlLabel } from '@mui/material';
 
 const initialFormState = PCM_PSTN_FIELDS.reduce((acc, field) => {
   if (field.type === 'checkbox') acc[field.key] = false;
@@ -7,64 +8,6 @@ const initialFormState = PCM_PSTN_FIELDS.reduce((acc, field) => {
   else acc[field.key] = '';
   return acc;
 }, {});
-
-const blueBarStyle = {
-  width: 900,
-  height: 36,
-  background: 'linear-gradient(to bottom, #b3e0ff 0%, #6ec1f7 50%, #3b8fd6 100%)',
-  borderTopLeftRadius: 8,
-  borderTopRightRadius: 8,
-  marginBottom: 0,
-  display: 'flex',
-  alignItems: 'center',
-  fontWeight: 600,
-  fontSize: 20,
-  color: '#2266aa',
-  justifyContent: 'center',
-  boxShadow: '0 2px 8px 0 rgba(80,160,255,0.10)',
-};
-
-const inputBlockStyle = {
-  width: '260px',
-  padding: '7px 8px',
-  fontSize: 16,
-  border: '1px solid #888',
-  borderRadius: 3,
-  background: '#fff',
-  marginTop: 2,
-  marginBottom: 2,
-  boxSizing: 'border-box',
-};
-
-const checkboxBlockStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  marginTop: 2,
-  marginBottom: 2,
-  height: 32,
-};
-
-const labelColStyle = {
-  flex: 1,
-  fontSize: 15,
-  textAlign: 'left',
-  paddingRight: 32,
-  minWidth: 260,
-};
-
-const inputColStyle = {
-  flex: 1,
-  display: 'flex',
-  alignItems: 'center',
-  minWidth: 260,
-};
-
-const rowStyle = {
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: 16,
-};
 
 const PcmPstnPage = () => {
   const [form, setForm] = useState(initialFormState);
@@ -80,28 +23,57 @@ const PcmPstnPage = () => {
   const handleSave = () => alert('Saved! (not implemented)');
 
   return (
-    <div style={{ maxWidth: 1100, width: 1100, minHeight: '100vh', margin: '0 auto', background: 'transparent', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
-      <div style={{ ...blueBarStyle, borderRadius: '12px 12px 0 0', width: 1100 }}>PSTN Configuration</div>
-      <div style={{ width: 1100, background: '#fff', border: '2px solid #888', borderTop: 'none', borderRadius: '0 0 12px 12px', boxShadow: '0 2px 8px #0001', padding: 0 }}>
-        <form onSubmit={e => e.preventDefault()} style={{ padding: 32, background: '#fff', borderBottomLeftRadius: 12, borderBottomRightRadius: 12 }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+    <div className="min-h-screen py-8 px-2 flex flex-col items-center bg-white">
+      <div className="w-full max-w-5xl mx-auto">
+        {/* Blue Bar */}
+        <div className="rounded-t-lg border-b-2 border-[#888] h-10 flex items-center justify-center font-semibold text-[20px] text-[#222] shadow-sm"
+          style={{background: 'linear-gradient(to bottom, #b3e0ff 0%, #6ec1f7 50%, #3b8fd6 100%)', boxShadow: '0 2px 8px 0 rgba(80,160,255,0.10)'}}>
+          PSTN Configuration
+        </div>
+        {/* Card */}
+        <div className="border-2 border-[#888] border-t-0 rounded-b-lg bg-white w-full py-8 md:py-12 px-4 md:px-10 flex flex-col gap-6 items-center">
+          <form onSubmit={e => e.preventDefault()} className="w-full">
+            <div className="flex flex-col gap-4">
             {PCM_PSTN_FIELDS.map(field => (
-              <div key={field.key} style={rowStyle}>
-                <div style={labelColStyle}>{field.label}</div>
-                <div style={inputColStyle}>
+                <div key={field.key} className="flex flex-col md:flex-row md:items-center md:justify-between w-full max-w-4xl mx-auto">
+                  <label className="md:w-1/2 w-full max-w-xs text-[16px] text-gray-800 text-left whitespace-nowrap md:pr-2 mb-1 md:mb-0">{field.label}</label>
+                  <div className="md:w-1/2 w-full max-w-xs flex items-center">
                   {field.type === 'select' && (
-                    <select value={form[field.key]} onChange={e => handleChange(field.key, e.target.value, field.type)} style={inputBlockStyle}>
-                      {field.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                    </select>
+                      <FormControl size="small" className="w-full">
+                        <Select
+                          value={form[field.key]}
+                          onChange={e => handleChange(field.key, e.target.value, field.type)}
+                          fullWidth
+                          variant="outlined"
+                          sx={{ fontSize: 16 }}
+                        >
+                          {field.options.map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
+                        </Select>
+                      </FormControl>
                   )}
                   {field.type === 'checkbox' && (
-                    <div style={checkboxBlockStyle}>
-                      <input type="checkbox" checked={form[field.key]} onChange={() => handleChange(field.key, null, field.type)} style={{ marginRight: 8 }} />
-                      <span style={{ fontSize: 15 }}>Enable</span>
-                    </div>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={form[field.key]}
+                            onChange={() => handleChange(field.key, null, field.type)}
+                            sx={{ color: '#6b7280', '&.Mui-checked': { color: '#6b7280' } }}
+                          />
+                        }
+                        label={<span className="text-[15px]">Enable</span>}
+                        className="pl-1"
+                      />
                   )}
                   {field.type === 'text' && (
-                    <input type="text" value={form[field.key]} onChange={e => handleChange(field.key, e.target.value, field.type)} style={inputBlockStyle} />
+                      <TextField
+                        type="text"
+                        value={form[field.key]}
+                        onChange={e => handleChange(field.key, e.target.value, field.type)}
+                        size="small"
+                        fullWidth
+                        variant="outlined"
+                        sx={{ fontSize: 16 }}
+                      />
                   )}
                 </div>
               </div>
@@ -109,18 +81,20 @@ const PcmPstnPage = () => {
           </div>
         </form>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 32 }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 32 }}>
-          <button type="button" onClick={handleSave} style={{ background: '#3bb6f5', color: '#fff', fontSize: 17, padding: '8px 38px', border: 'none', borderRadius: 4, cursor: 'pointer', boxShadow: '0 2px 4px #3bb6f599' }}>Save</button>
-          <button type="button" onClick={handleReset} style={{ background: '#3bb6f5', color: '#fff', fontSize: 17, padding: '8px 38px', border: 'none', borderRadius: 4, cursor: 'pointer', boxShadow: '0 2px 4px #3bb6f599' }}>Reset</button>
+        {/* Buttons and Info */}
+        <div className="flex flex-col items-center mt-8 w-full">
+          <div className="flex justify-center gap-8 w-full">
+            <Button variant="contained" onClick={handleSave} sx={{background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600, fontSize: 18, borderRadius: 2, minWidth: 120, minHeight: 40, textTransform: 'none', boxShadow: '0 2px 8px #b3e0ff', '&:hover': {background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)'}}}>Save</Button>
+            <Button variant="contained" onClick={handleReset} sx={{background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600, fontSize: 18, borderRadius: 2, minWidth: 120, minHeight: 40, textTransform: 'none', boxShadow: '0 2px 8px #b3e0ff', '&:hover': {background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)'}}}>Reset</Button>
         </div>
-        <div style={{ color: 'red', textAlign: 'center', marginTop: 18, fontSize: 15, paddingBottom: 16, maxWidth: 900 }}>
+          <div className="text-red-600 text-center mt-6 text-[15px] pb-4 max-w-2xl">
           Note 1: In the feature of E1 Outgoing Call Monthly Time Limit, "*" represents all PCMs; once there exist multiple PCMs, they are separated by ",", such as: 1, 2, 3, 4.<br/>
           Note 2: In the feature of E1 Outgoing Call Monthly Time Limit, you can set only one time limit (min) to apply to all the PCMs. If multiple time limits are set, be sure they are as many as corresponding PCMs and separate them by "," too, such as: 1, 3, 4, 6.
+          </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default PcmPstnPage 
+export default PcmPstnPage; 

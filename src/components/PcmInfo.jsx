@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {PCM_FIELDS} from "../constants/PsmInfoConstants"
+import {PCM_FIELDS} from "../constants/PcmInfoConstants"
 import Button from '@mui/material/Button';
 
 const getInitialFormData = () => {

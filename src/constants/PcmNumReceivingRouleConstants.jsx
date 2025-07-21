@@ -5,7 +5,7 @@ export const NUM_RECEIVING_RULE_FIELDS = [
     name: 'index',
     label: 'Index',
     type: 'select',
-    options: Array.from({ length: 200 }, (_, i) => ({ value: 199 - i, label: (199 - i).toString() })),
+    options: Array.from({ length: 1 }, (_, i) => ({ value: i, label: i.toString() })),
   },
   {
     name: 'rule',
@@ -22,7 +22,7 @@ export const NUM_RECEIVING_RULE_FIELDS = [
 ];
 
 export const NUM_RECEIVING_RULE_INITIAL_FORM = {
-  index: 199,
+  index: 0,
   rule: '',
   description: 'default',
 };

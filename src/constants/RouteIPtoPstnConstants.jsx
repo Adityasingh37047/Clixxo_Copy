@@ -1,5 +1,5 @@
 export const ROUTE_IP_PSTN_FIELDS = [
-  { key: 'index', label: 'Index', type: 'select', options: Array.from({length: 256}, (_, i) => i + 1) },
+  { key: 'index', label: 'Index', type: 'select', options: Array.from({length: 1}, (_, i) => i + 1) },
   { key: 'callSource', label: 'Call Source', type: 'select', options: ['SIP Trunk Group [0]', 'SIP Trunk Group [1]'] },
   { key: 'callerIdPrefix', label: 'CallerID Prefix', type: 'text' },
   { key: 'calleeIdPrefix', label: 'CalleeID Prefix', type: 'text' },
@@ -9,7 +9,7 @@ export const ROUTE_IP_PSTN_FIELDS = [
 ];
 
 export const ROUTE_IP_PSTN_INITIAL_FORM = {
-  index: 255,
+  index: 1,
   callSource: 'SIP Trunk Group [0]',
   callerIdPrefix: '*',
   calleeIdPrefix: '*',

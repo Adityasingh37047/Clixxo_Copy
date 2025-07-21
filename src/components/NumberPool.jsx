@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { NUMBER_POOL_COLUMNS, NUMBER_POOL_GROUPS } from '../constants/NumberPoolConstants';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select as MuiSelect, MenuItem } from '@mui/material';
 import EditDocumentIcon from '@mui/icons-material/EditDocument';
 
 const tableContainerStyle = {
@@ -205,268 +206,89 @@ const NumberPool = () => {
   const thumbTop = scrollState.height && scrollState.scrollHeight && scrollState.scrollHeight > scrollState.height ? ((scrollState.top / (scrollState.scrollHeight - scrollState.height)) * maxThumbTop) : 0;
 
   return (
-    <div style={{ background: '#fff', minHeight: '100vh', padding: 8 }}>
-      <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-        <div style={tableContainerStyle}>
-          <div style={blueBarStyle}>Number Pool</div>
-          <div style={contentAreaStyle}>
-            <div style={{ position: 'relative', height: 400, width: '100%' }}>
-              <div
-                ref={tableScrollRef}
-                onScroll={handleTableScroll}
-                style={{ height: 400, overflowY: 'auto', width: '100%', paddingRight: 18, borderBottomLeftRadius: 8 }}
-              >
-                <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'auto', borderBottomLeftRadius: 8 }}>
-                  <thead>
-                    <tr>
-                      {NUMBER_POOL_COLUMNS.map((col, i) => (
-                        <th key={col.key} style={{ ...thStyle, width: i === 0 ? 40 : i === 1 ? 70 : i === 2 ? 90 : i === 3 ? 120 : 60 }}>{col.label}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {displayRows.map((row, idx) =>
-                      row ? (
-                        <tr key={row.id}>
-                          <td style={{ ...tdStyle, width: 40 }}><input type="checkbox" checked={row.checked} onChange={() => handleCheck(idx)} /></td>
-                          <td style={{ ...tdStyle, width: 70 }}>{row.groupNo}</td>
-                          <td style={{ ...tdStyle, width: 90 }}>{row.noInGroup}</td>
-                          <td style={{ ...tdStyle, width: 120 }}>{row.numberRange}</td>
-                          <td style={{ ...tdStyle, width: 60, textAlign: 'center', verticalAlign: 'middle', height: 48 }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                              <EditDocumentIcon style={{ color: '#1976d2', fontSize: 22, cursor: 'pointer' }} onClick={() => openModal(idx)} />
-                            </div>
-                          </td>
-                        </tr>
-                      ) : (
-                        <tr key={idx}>
-                          <td style={{ ...emptyRowStyle, width: 40, color: '#aaa' }}>&nbsp;</td>
-                          <td style={{ ...emptyRowStyle, width: 70, color: '#aaa' }}>&nbsp;</td>
-                          <td style={{ ...emptyRowStyle, width: 90, color: '#aaa' }}>&nbsp;</td>
-                          <td style={{ ...emptyRowStyle, width: 120, color: '#aaa' }}>&nbsp;</td>
-                          <td style={{ ...emptyRowStyle, width: 60, color: '#aaa' }}>&nbsp;</td>
-                        </tr>
-                      )
-                    )}
-                  </tbody>
-                </table>
-              </div>
-              {/* Custom vertical scrollbar */}
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                right: 2,
-                width: 16,
-                height: 400,
-                background: '#e3e7ef',
-                borderRadius: 8,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                zIndex: 2,
-              }}>
-                {/* Up arrow */}
-                <div
-                  style={{
-                    width: 16,
-                    height: 20,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                    borderTopLeftRadius: 8,
-                    borderTopRightRadius: 8,
-                  }}
-                  onClick={() => {
-                    if (tableScrollRef.current) {
-                      tableScrollRef.current.scrollTop -= 40;
-                    }
-                  }}
-                >
-                  <svg width="12" height="8" viewBox="0 0 12 8"><polygon points="6,2 11,7 1,7" fill="#444" /></svg>
-                </div>
-                {/* Scrollbar thumb */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: 3,
-                    width: 10,
-                    height: thumbHeight,
-                    top: 20 + thumbTop,
-                    background: '#888',
-                    borderRadius: 8,
-                    cursor: 'pointer',
-                    transition: 'background 0.2s',
-                  }}
-                  onMouseDown={e => {
-                    const startY = e.clientY;
-                    const startTop = scrollState.top;
-                    const thumbArea = 400 - 40; // 20px for each arrow
-                    const maxThumbTop = thumbArea - thumbHeight;
-                    const maxScroll = scrollState.scrollHeight - scrollState.height;
-                    const onMove = moveEvent => {
-                      if (!tableScrollRef.current) return;
-                      const delta = moveEvent.clientY - startY;
-                      let newThumbTop = Math.min(Math.max(0, thumbTop + delta), maxThumbTop);
-                      let newScrollTop = (newThumbTop / maxThumbTop) * maxScroll;
-                      tableScrollRef.current.scrollTop = newScrollTop;
-                    };
-                    const onUp = () => {
-                      window.removeEventListener('mousemove', onMove);
-                      window.removeEventListener('mouseup', onUp);
-                    };
-                    window.addEventListener('mousemove', onMove);
-                    window.addEventListener('mouseup', onUp);
-                  }}
-                />
-                {/* Down arrow */}
-                <div
-                  style={{
-                    width: 16,
-                    height: 20,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    borderBottomLeftRadius: 8,
-                    borderBottomRightRadius: 8,
-                  }}
-                  onClick={() => {
-                    if (tableScrollRef.current) {
-                      tableScrollRef.current.scrollTop += 40;
-                    }
-                  }}
-                >
-                  <svg width="12" height="8" viewBox="0 0 12 8"><polygon points="1,1 11,1 6,7" fill="#444" /></svg>
-                </div>
-              </div>
+    <div className="bg-white min-h-screen p-2 md:p-6">
+      <div className="w-full max-w-7xl mx-auto">
+        <div className="flex flex-col gap-6">
+          <div className="bg-white border-2 border-gray-300 rounded-lg shadow-sm w-full min-h-[400px] flex flex-col">
+            <div className="w-full h-8 bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] rounded-t-lg flex items-center font-semibold text-[17px] text-[#222] justify-center border-b-2 border-gray-300">Number Pool</div>
+            <div className="overflow-x-auto w-full" style={{ height: 400 }}>
+              <table className="w-full md:min-w-[700px] border border-gray-300 border-collapse">
+                <thead>
+                  <tr>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Check</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Group No.</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">No. in Group</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Number Range</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Modify</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayRows.map((row, idx) =>
+                    row ? (
+                      <tr key={idx}>
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white"><input type="checkbox" checked={row.checked || false} onChange={() => handleCheck(idx)} /></td>
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.groupNo}</td>
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.noInGroup}</td>
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.numberRange}</td>
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">
+                          <EditDocumentIcon style={{ color: '#0e8fd6', cursor: 'pointer', margin: '0 auto' }} onClick={() => openModal(idx)} />
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr key={idx}>
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '12px 0 0 0', maxWidth: 1400, margin: '0 auto' }}>
-          <div>
-            <button style={grayButtonStyle} onClick={handleDelete}>Delete</button>
-            <button style={grayButtonStyle} onClick={handleClearAll}>Clear All</button>
+          <div className="flex flex-wrap gap-2 justify-between items-center mt">
+            <div className="flex gap-2">
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleDelete}>Delete</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleClearAll}>Clear All</button>
+            </div>
+            <button className="bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white font-semibold text-base rounded px-6 py-2 min-w-[120px] shadow hover:from-[#0e8fd6] hover:to-[#3bb6f5]" onClick={() => openModal()}>Add New</button>
           </div>
-          <button style={buttonStyle} onClick={() => openModal()}>Add New</button>
         </div>
-      </div>
-      {modalOpen && (
-        <div style={legacyModalOverlay}>
-          <div style={{
-            ...legacyModalBox,
-            minWidth: 380,
-            background: '#e9edf2',
-            border: '2px solid #222',
-            boxShadow: '0 4px 24px #0005',
-            padding: '0 24px 18px 24px',
-          }}>
-            <div style={{
-              ...legacyModalHeader,
-              background: 'linear-gradient(to bottom, #3b4a56 0%, #222 100%)',
-              color: '#fff',
-              fontWeight: 500,
-              fontSize: 16,
-              padding: '10px 0 8px 0',
-              borderTopLeftRadius: 4,
-              borderTopRightRadius: 4,
-              textAlign: 'center',
-              margin: '-2px -24px 18px -24px',
-              letterSpacing: 0.2,
-            }}>Number Pool</div>
-            <div>
-              {/* Group block */}
-              <div style={{
-                border: '1px solid #bfc6c9',
-                borderRadius: 4,
-                background: '#fff',
-                marginBottom: 12,
-                padding: '6px 8px',
-                display: 'flex',
-                alignItems: 'center',
-              }}>
-                <label style={{ ...legacyModalLabel, width: 120, marginBottom: 0 }}>Group:</label>
-                <select name="groupNo" value={form.groupNo} onChange={handleFormChange} style={{ ...legacyModalInput, width: 180, marginBottom: 0, background: '#fafdff', border: '1px solid #bbb' }}>
+        {/* Modal */}
+        <Dialog open={modalOpen} onClose={closeModal} maxWidth={false} PaperProps={{ sx: { maxWidth: '95vw', width: 380, background: '#f4f6fa', borderRadius: 2, border: '1.5px solid #888' } }}>
+          <DialogTitle className="bg-gradient-to-b from-gray-800 to-gray-600 text-white text-center font-semibold p-3 text-base rounded-t-md">
+            Number Pool
+          </DialogTitle>
+          <DialogContent className="pt-3 pb-0 px-2" style={{padding: '24px 24px 0 24px'}}>
+            <div className="flex flex-col gap-0 w-full">
+              <div className="flex items-center gap-2 mb-4">
+                <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">Group No.:</label>
+                <MuiSelect name="groupNo" value={form.groupNo} onChange={handleFormChange} size="small" fullWidth variant="outlined" sx={{ fontSize: 14 }}>
                   {NUMBER_POOL_GROUPS.map((g) => (
-                    <option key={g.value} value={g.value}>{g.label}</option>
+                    <MenuItem key={g.value} value={g.value} sx={{ fontSize: 14 }}>{g.label}</MenuItem>
                   ))}
-                </select>
+                </MuiSelect>
               </div>
-              {/* No. in Group block */}
-              <div style={{
-                border: '1px solid #bfc6c9',
-                borderRadius: 4,
-                background: '#fff',
-                marginBottom: 12,
-                padding: '6px 8px',
-                display: 'flex',
-                alignItems: 'center',
-              }}>
-                <label style={{ ...legacyModalLabel, width: 120, marginBottom: 0 }}>No. in Group:</label>
-                <input name="noInGroup" type="number" min="1" value={form.noInGroup} onChange={handleFormChange} style={{ ...legacyModalInput, width: 180, marginBottom: 0, background: '#fafdff', border: '1px solid #bbb' }} />
+              <div className="flex items-center gap-2 mb-4">
+                <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">No. in Group:</label>
+                <TextField name="noInGroup" type="text" value={form.noInGroup} onChange={handleFormChange} size="small" fullWidth variant="outlined" inputProps={{ style: { fontSize: 14, padding: '3px 6px' } }} />
               </div>
-              {/* Number Range block, two bordered rows */}
-              <div style={{
-                border: '1px solid #bfc6c9',
-                borderRadius: '4px 4px 0 0',
-                background: '#fff',
-                marginBottom: 0,
-                padding: '6px 8px',
-                display: 'flex',
-                alignItems: 'center',
-              }}>
-                <label style={{ ...legacyModalLabel, width: 120, marginBottom: 0 }}>Number Range:</label>
-                <input name="numberRangeStart" value={form.numberRangeStart} onChange={handleFormChange} style={{ ...legacyModalInput, width: 180, marginBottom: 0, background: '#fafdff', border: '1px solid #bbb' }} />
-              </div>
-              <div style={{
-                border: '1px solid #bfc6c9',
-                borderTop: 'none',
-                borderRadius: '0 0 4px 4px',
-                background: '#fff',
-                marginBottom: 18,
-                padding: '6px 8px',
-                display: 'flex',
-                alignItems: 'center',
-              }}>
-                <span style={{ display: 'inline-block', width: 120 }}></span>
-                <span style={{ display: 'inline-block', minWidth: 18, textAlign: 'center', fontWeight: 600, fontSize: 18, color: '#888', marginRight: 8 }}>--</span>
-                <input name="numberRangeEnd" value={form.numberRangeEnd} onChange={handleFormChange} style={{ ...legacyModalInput, width: 180, marginBottom: 0, background: '#fafdff', border: '1px solid #bbb' }} />
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 18, marginTop: 18 }}>
-                <button onClick={handleSave} style={{
-                  background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
-                  color: '#fff',
-                  fontWeight: 600,
-                  fontSize: 15,
-                  border: '1px solid #1976d2',
-                  borderRadius: 4,
-                  padding: '6px 32px',
-                  minWidth: 90,
-                  boxShadow: '0 2px 6px #0002',
-                  cursor: 'pointer',
-                }}>Save</button>
-                <button onClick={closeModal} style={{
-                  background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)',
-                  color: '#222',
-                  fontWeight: 600,
-                  fontSize: 15,
-                  border: '1px solid #bbb',
-                  borderRadius: 4,
-                  padding: '6px 32px',
-                  minWidth: 90,
-                  boxShadow: '0 2px 6px #0002',
-                  cursor: 'pointer',
-                }}>Close</button>
+              <div className="flex items-center gap-2 mb-4">
+                <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">Number Range:</label>
+                <TextField name="numberRangeStart" type="text" value={form.numberRangeStart} onChange={handleFormChange} size="small" fullWidth variant="outlined" inputProps={{ style: { fontSize: 14, padding: '3px 6px' }, placeholder: 'Start' }} className="mr-2" />
+                <span className="mx-1">--</span>
+                <TextField name="numberRangeEnd" type="text" value={form.numberRangeEnd} onChange={handleFormChange} size="small" fullWidth variant="outlined" inputProps={{ style: { fontSize: 14, padding: '3px 6px' }, placeholder: 'End' }} />
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </DialogContent>
+          <DialogActions className="p-6 pt-2 justify-center gap-6">
+            <button className="bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white font-semibold text-base rounded px-8 py-2 min-w-[100px] shadow hover:from-[#0e8fd6] hover:to-[#3bb6f5]" onClick={handleSave}>Save</button>
+            <button className="bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white font-semibold text-base rounded px-8 py-2 min-w-[100px] shadow hover:from-[#0e8fd6] hover:to-[#3bb6f5]" onClick={closeModal}>Cancel</button>
+          </DialogActions>
+        </Dialog>
+      </div>
     </div>
   );
 };

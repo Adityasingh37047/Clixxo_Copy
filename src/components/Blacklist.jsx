@@ -1,85 +1,7 @@
-import React, { useState, useRef } from 'react';
-import { BLACKLIST_TABLE_COLUMNS, BLACKLIST_CALLEE_TABLE_COLUMNS } from '../constants/BlacklistConstants';
-import { FaPencilAlt } from 'react-icons/fa';
-
-const tableContainerStyle = {
-  background: '#fff',
-  border: '2px solidrgb(163, 189, 216)',
-  borderRadius: 8,
-  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-  width: '100%',
-  minHeight: 400,
-  display: 'flex',
-  flexDirection: 'column',
-};
-const blueBarStyle = {
-  width: '100%',
-  height: 32,
-  background: 'linear-gradient(to bottom, #b3e0ff 0%, #6ec1f7 50%, #3b8fd6 100%)',
-  borderTopLeftRadius: 8,
-  borderTopRightRadius: 8,
-  display: 'flex',
-  alignItems: 'center',
-  fontWeight: 400,
-  fontSize: 17,
-  color: '#111',
-  justifyContent: 'center',
-  boxShadow: '0 2px 8px 0 rgba(80,160,255,0.10)',
-  borderBottom: '2px solid #b0c4d9',
-};
-const thStyle = {
-  background: '#fff', color: '#222', fontWeight: 600, fontSize: 15, border: '1px solid #bbb', padding: '6px 8px', whiteSpace: 'nowrap', textAlign: 'center',
-};
-const tdStyle = {
-  border: '1px solid #bbb', padding: '6px 8px', fontSize: 14, background: '#fff', textAlign: 'center', whiteSpace: 'nowrap', height: 40,
-};
-const emptyRowStyle = {
-  ...tdStyle,
-  borderBottom: '1px solid #bbb',
-  background: '#fff',
-  height: 40,
-};
-const buttonStyle = {
-  background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600, fontSize: 16, border: 'none', borderRadius: 6, padding: '7px 32px', minWidth: 100, boxShadow: '0 2px 6px #0002', cursor: 'pointer', margin: '0 8px',
-};
-const grayButtonStyle = {
-  ...buttonStyle, background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)', color: '#222',
-};
-
-// Modal styles for legacy look
-const legacyModalOverlay = {
-  position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.18)', zIndex: 1000,
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-};
-const legacyModalBox = {
-  background: '#f4f6fa',
-  borderRadius: 6,
-  boxShadow: '0 4px 24px #0005',
-  minWidth: 340,
-  maxWidth: '90vw',
-  padding: '0 24px 18px 24px',
-  border: '2px solid #222',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'stretch',
-};
-const legacyModalHeader = {
-  background: 'linear-gradient(to bottom, #3b4a56 0%, #222 100%)',
-  color: '#fff',
-  fontWeight: 500,
-  fontSize: 16,
-  padding: '10px 0 8px 0',
-  borderTopLeftRadius: 4,
-  borderTopRightRadius: 4,
-  textAlign: 'center',
-  margin: '-2px -24px 18px -24px',
-  letterSpacing: 0.2,
-};
-const legacyModalLabel = { fontWeight: 500, marginBottom: 2, fontSize: 14 };
-const legacyModalInput = { width: '100%', fontSize: 14, padding: '4px 8px', borderRadius: 3, border: '1px solid #bbb', background: '#fafdff', marginBottom: 10, height: 28 };
-const legacyModalButtonBar = { display: 'flex', justifyContent: 'center', gap: 18, marginTop: 8 };
-const legacySaveButton = { background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600, fontSize: 15, border: '1px solid #1976d2', borderRadius: 4, padding: '6px 32px', minWidth: 90, boxShadow: '0 2px 6px #0002', cursor: 'pointer' };
-const legacyCloseButton = { background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)', color: '#222', fontWeight: 600, fontSize: 15, border: '1px solid #bbb', borderRadius: 4, padding: '6px 32px', minWidth: 90, boxShadow: '0 2px 6px #0002', cursor: 'pointer' };
+import React, { useState } from 'react';
+import { BLACKLIST_TABLE_COLUMNS } from '../constants/BlacklistConstants';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select as MuiSelect, MenuItem } from '@mui/material';
+import EditDocumentIcon from '@mui/icons-material/EditDocument';
 
 const Blacklist = () => {
   const [callerRows, setCallerRows] = useState([]);
@@ -100,209 +22,159 @@ const Blacklist = () => {
 
   const handleSave = () => {
     if (modalType === 'caller') {
-      setCallerRows([
-        ...callerRows,
-        {
-          groupNo: modalData.groupNo,
-          noInGroup: modalData.noInGroup,
-          callerId: modalData.idValue,
-        },
-      ]);
+      setCallerRows([...callerRows, { groupNo: modalData.groupNo, noInGroup: modalData.noInGroup, callerId: modalData.idValue }]);
     } else {
-      setCalleeRows([
-        ...calleeRows,
-        {
-          groupNo: modalData.groupNo,
-          noInGroup: modalData.noInGroup,
-          calleeId: modalData.idValue,
-        },
-      ]);
+      setCalleeRows([...calleeRows, { groupNo: modalData.groupNo, noInGroup: modalData.noInGroup, calleeId: modalData.idValue }]);
     }
     setShowModal(false);
   };
 
-  // Checkbox handlers
-  const handleCallerCheck = idx => {
-    setCallerChecked(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
-  };
-  const handleCalleeCheck = idx => {
-    setCalleeChecked(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
-  };
-  // Delete and Clear All handlers
-  const handleCallerDelete = () => {
-    setCallerRows(rows => rows.filter((_, idx) => !callerChecked.includes(idx)));
-    setCallerChecked([]);
-  };
-  const handleCallerClear = () => {
-    setCallerRows([]);
-    setCallerChecked([]);
-  };
-  const handleCalleeDelete = () => {
-    setCalleeRows(rows => rows.filter((_, idx) => !calleeChecked.includes(idx)));
-    setCalleeChecked([]);
-  };
-  const handleCalleeClear = () => {
-    setCalleeRows([]);
-    setCalleeChecked([]);
-  };
+  const handleCallerCheck = idx => setCallerChecked(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
+  const handleCalleeCheck = idx => setCalleeChecked(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
+  const handleCallerDelete = () => { setCallerRows(rows => rows.filter((_, idx) => !callerChecked.includes(idx))); setCallerChecked([]); };
+  const handleCallerClear = () => { setCallerRows([]); setCallerChecked([]); };
+  const handleCalleeDelete = () => { setCalleeRows(rows => rows.filter((_, idx) => !calleeChecked.includes(idx))); setCalleeChecked([]); };
+  const handleCalleeClear = () => { setCalleeRows([]); setCalleeChecked([]); };
 
   return (
-    <div style={{ background: '#fff', minHeight: '100vh', padding: 8 }}>
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-        {/* CallerID Blacklist Table */}
-        <div style={{ width: '50%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12, gap: 12 }}>
-            <label style={{ fontWeight: 500, fontSize: 16, minWidth: 80 }}>CallerID:</label>
-            <input value={callerSearch} onChange={e => setCallerSearch(e.target.value)} style={{ flex: 1, fontSize: 16, padding: '4px 8px', borderRadius: 4, border: '1px solid #bbb' }} />
-            <button style={buttonStyle}>Search</button>
+    <div className="bg-white min-h-screen p-2 md:p-6">
+      <div className="flex flex-col md:flex-row gap-6 w-full max-w-7xl mx-auto">
+        {/* CallerID Table */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center mb-3 gap-3">
+            <label className="font-semibold text-base min-w-[80px]">CallerID:</label>
+            <TextField value={callerSearch} onChange={e => setCallerSearch(e.target.value)} size="small" variant="outlined" className="flex-1" />
+            <Button variant="contained" sx={{ background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600 }}>Search</Button>
           </div>
-          <div style={tableContainerStyle}>
-            <div style={blueBarStyle}>CallerID Blacklist</div>
-            <div className="custom-scroll-x" style={{ height: 400, overflowY: 'auto', width: '100%' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'auto' }}>
+          <div className="bg-white border-2 border-gray-300 rounded-lg shadow-sm w-full min-h-[400px] flex flex-col">
+            <div className="w-full h-8 bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] rounded-t-lg flex items-center font-semibold text-[17px] text-[#222] justify-center border-b-2 border-gray-300">CallerID Blacklist</div>
+            <div className="overflow-x-auto w-full" style={{ height: 400 }}>
+              <table className="min-w-full md:min-w-[420px] w-full border border-gray-300 border-collapse">
                 <thead>
                   <tr>
-                    <th style={{ ...thStyle, width: 40 }}>Check</th>
-                    <th style={{ ...thStyle, width: 70 }}>Group No.</th>
-                    <th style={{ ...thStyle, width: 90 }}>No. in Group</th>
-                    <th style={{ ...thStyle, width: 120 }}>CallerID</th>
-                    <th style={{ ...thStyle, width: 60 }}>Modify</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Check</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Group No.</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">No. in Group</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">CallerID</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Modify</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    ...callerRows.map((row, idx) => (
-                      <tr key={idx}>
-                        <td style={{ ...tdStyle, width: 40 }}><input type="checkbox" checked={callerChecked.includes(idx)} onChange={() => handleCallerCheck(idx)} /></td>
-                        <td style={{ ...tdStyle, width: 70 }}>{row.groupNo}</td>
-                        <td style={{ ...tdStyle, width: 90 }}>{row.noInGroup}</td>
-                        <td style={{ ...tdStyle, width: 120 }}>{row.callerId}</td>
-                        <td style={{ ...tdStyle, width: 60, textAlign: 'center', verticalAlign: 'middle', height: 48 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                            <FaPencilAlt style={{ color: '#1976d2', fontSize: 22, cursor: 'pointer' }} />
-                          </div>
-                        </td>
-                      </tr>
-                    )),
-                    ...Array.from({ length: Math.max(0, 10 - callerRows.length) }).map((_, i) => (
-                      <tr key={callerRows.length + i}>
-                        <td style={{ ...emptyRowStyle, width: 40, color: '#aaa' }}>&nbsp;</td>
-                        <td style={{ ...emptyRowStyle, width: 70, color: '#aaa' }}>&nbsp;</td>
-                        <td style={{ ...emptyRowStyle, width: 90, color: '#aaa' }}>&nbsp;</td>
-                        <td style={{ ...emptyRowStyle, width: 120, color: '#aaa' }}>&nbsp;</td>
-                        <td style={{ ...emptyRowStyle, width: 60, color: '#aaa' }}>&nbsp;</td>
-                      </tr>
-                    ))
-                  ]}
+                  {callerRows.map((row, idx) => (
+                    <tr key={idx}>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white"><input type="checkbox" checked={callerChecked.includes(idx)} onChange={() => handleCallerCheck(idx)} /></td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.groupNo}</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.noInGroup}</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.callerId}</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white"><EditDocumentIcon style={{ color: '#0e8fd6', cursor: 'pointer', margin: '0 auto' }} /></td>
+                    </tr>
+                  ))}
+                  {Array.from({ length: Math.max(0, 10 - callerRows.length) }).map((_, idx) => (
+                    <tr key={`empty-caller-${idx}`}> 
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '12px 0 0 0' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <div>
-                <button style={grayButtonStyle} disabled={callerChecked.length === 0} onClick={handleCallerDelete}>Delete</button>
-                <button style={grayButtonStyle} disabled={callerRows.length === 0} onClick={handleCallerClear}>Clear All</button>
-              </div>
-              <span style={{ marginTop: 4, color: '#888', fontSize: 14 }}>0 items Total</span>
+          <div className="flex flex-wrap gap-2 justify-between items-center mt-4">
+            <div className="flex gap-2">
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" disabled={callerChecked.length === 0} onClick={handleCallerDelete}>Delete</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" disabled={callerRows.length === 0} onClick={handleCallerClear}>Clear All</button>
             </div>
-            <button style={buttonStyle} onClick={() => handleAddNew('caller')}>Add New</button>
+            <button className="bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white font-semibold text-base rounded px-6 py-2 min-w-[120px] shadow hover:from-[#0e8fd6] hover:to-[#3bb6f5]" onClick={() => handleAddNew('caller')}>Add New</button>
           </div>
         </div>
-        {/* CalleeID Blacklist Table */}
-        <div style={{ width: '50%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 12, gap: 12 }}>
-            <label style={{ fontWeight: 500, fontSize: 16, minWidth: 80 }}>CalleeID:</label>
-            <input value={calleeSearch} onChange={e => setCalleeSearch(e.target.value)} style={{ flex: 1, fontSize: 16, padding: '4px 8px', borderRadius: 4, border: '1px solid #bbb' }} />
-            <button style={buttonStyle}>Search</button>
+        {/* CalleeID Table */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center mb-3 gap-3">
+            <label className="font-semibold text-base min-w-[80px]">CalleeID:</label>
+            <TextField value={calleeSearch} onChange={e => setCalleeSearch(e.target.value)} size="small" variant="outlined" className="flex-1" />
+            <Button variant="contained" sx={{ background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600 }}>Search</Button>
           </div>
-          <div style={tableContainerStyle}>
-            <div style={blueBarStyle}>CalleeID Blacklist</div>
-            <div className="custom-scroll-x" style={{ height: 400, overflowY: 'auto', width: '100%' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'auto' }}>
+          <div className="bg-white border-2 border-gray-300 rounded-lg shadow-sm w-full min-h-[400px] flex flex-col">
+            <div className="w-full h-8 bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] rounded-t-lg flex items-center font-semibold text-[17px] text-[#222] justify-center border-b-2 border-gray-300">CalleeID Blacklist</div>
+            <div className="overflow-x-auto w-full" style={{ height: 400 }}>
+              <table className="min-w-full md:min-w-[420px] w-full border border-gray-300 border-collapse">
                 <thead>
                   <tr>
-                    <th style={{ ...thStyle, width: 40 }}>Check</th>
-                    <th style={{ ...thStyle, width: 70 }}>Group No.</th>
-                    <th style={{ ...thStyle, width: 90 }}>No. in Group</th>
-                    <th style={{ ...thStyle, width: 120 }}>CalleeID</th>
-                    <th style={{ ...thStyle, width: 60 }}>Modify</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Check</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Group No.</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">No. in Group</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">CalleeID</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Modify</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    ...calleeRows.map((row, idx) => (
-                      <tr key={idx}>
-                        <td style={{ ...tdStyle, width: 40 }}><input type="checkbox" checked={calleeChecked.includes(idx)} onChange={() => handleCalleeCheck(idx)} /></td>
-                        <td style={{ ...tdStyle, width: 70 }}>{row.groupNo}</td>
-                        <td style={{ ...tdStyle, width: 90 }}>{row.noInGroup}</td>
-                        <td style={{ ...tdStyle, width: 120 }}>{row.calleeId}</td>
-                        <td style={{ ...tdStyle, width: 60, textAlign: 'center', verticalAlign: 'middle', height: 48 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                            <FaPencilAlt style={{ color: '#1976d2', fontSize: 22, cursor: 'pointer' }} />
-                          </div>
-                        </td>
-                      </tr>
-                    )),
-                    ...Array.from({ length: Math.max(0, 10 - calleeRows.length) }).map((_, i) => (
-                      <tr key={calleeRows.length + i}>
-                        <td style={{ ...emptyRowStyle, width: 40, color: '#aaa' }}>&nbsp;</td>
-                        <td style={{ ...emptyRowStyle, width: 70, color: '#aaa' }}>&nbsp;</td>
-                        <td style={{ ...emptyRowStyle, width: 90, color: '#aaa' }}>&nbsp;</td>
-                        <td style={{ ...emptyRowStyle, width: 120, color: '#aaa' }}>&nbsp;</td>
-                        <td style={{ ...emptyRowStyle, width: 60, color: '#aaa' }}>&nbsp;</td>
-                      </tr>
-                    ))
-                  ]}
+                  {calleeRows.map((row, idx) => (
+                    <tr key={idx}>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white"><input type="checkbox" checked={calleeChecked.includes(idx)} onChange={() => handleCalleeCheck(idx)} /></td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.groupNo}</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.noInGroup}</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.calleeId}</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white"><EditDocumentIcon style={{ color: '#0e8fd6', cursor: 'pointer', margin: '0 auto' }} /></td>
+                    </tr>
+                  ))}
+                  {Array.from({ length: Math.max(0, 10 - calleeRows.length) }).map((_, idx) => (
+                    <tr key={`empty-callee-${idx}`}> 
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '12px 0 0 0' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <div>
-                <button style={grayButtonStyle} disabled={calleeChecked.length === 0} onClick={handleCalleeDelete}>Delete</button>
-                <button style={grayButtonStyle} disabled={calleeRows.length === 0} onClick={handleCalleeClear}>Clear All</button>
-              </div>
-              <span style={{ marginTop: 4, color: '#888', fontSize: 14 }}>0 items Total</span>
+          <div className="flex flex-wrap gap-2 justify-between items-center mt-4">
+            <div className="flex gap-2">
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" disabled={calleeChecked.length === 0} onClick={handleCalleeDelete}>Delete</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" disabled={calleeRows.length === 0} onClick={handleCalleeClear}>Clear All</button>
             </div>
-            <button style={buttonStyle} onClick={() => handleAddNew('callee')}>Add New</button>
+            <button className="bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white font-semibold text-base rounded px-6 py-2 min-w-[120px] shadow hover:from-[#0e8fd6] hover:to-[#3bb6f5]" onClick={() => handleAddNew('callee')}>Add New</button>
           </div>
         </div>
       </div>
-      <div style={{ textAlign: 'center', color: 'red', fontSize: 15, marginTop: 24 }}>
+      <div className="text-center text-red-600 text-base mt-8">
         Note: The one list, only the latest 200 pieces will be displayed. To check all the records, please backup the file.
       </div>
-      {/* Modal for Add New CallerID or CalleeID (legacy style) */}
-      {showModal && (
-        <div style={legacyModalOverlay}>
-          <div style={legacyModalBox}>
-            <div style={legacyModalHeader}>
-              {modalType === 'caller' ? 'CallerIDs in Blacklist' : 'CalleeIDs in Blacklist'}
-            </div>
-            <div style={{ marginBottom: 8 }}>
-              <label style={legacyModalLabel}>Group No.:</label>
-              <select value={modalData.groupNo} onChange={e => setModalData({ ...modalData, groupNo: e.target.value })} style={legacyModalInput}>
+      {/* Modal */}
+      <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth={false} PaperProps={{ sx: { maxWidth: '95vw', width: 380, background: '#f4f6fa', borderRadius: 2, border: '1.5px solid #888' } }}>
+        <DialogTitle className="bg-gradient-to-b from-gray-800 to-gray-600 text-white text-center font-semibold p-3 text-base rounded-t-md">
+          {modalType === 'caller' ? 'CallerIDs in Blacklist' : 'CalleeIDs in Blacklist'}
+        </DialogTitle>
+        <DialogContent className="pt-3 pb-0 px-2" style={{padding: '24px 24px 0 24px'}}>
+          <div className="flex flex-col gap-0 w-full">
+            <div className="flex items-center gap-2 mb-4">
+              <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">Group No.:</label>
+              <MuiSelect value={modalData.groupNo} onChange={e => setModalData({ ...modalData, groupNo: e.target.value })} size="small" fullWidth variant="outlined" sx={{ fontSize: 14 }}>
                 {[...Array(10).keys()].map(i => (
-                  <option key={i} value={i}>{i}</option>
+                  <MenuItem key={i} value={i} sx={{ fontSize: 14 }}>{i}</MenuItem>
                 ))}
-              </select>
+              </MuiSelect>
             </div>
-            <div style={{ marginBottom: 8 }}>
-              <label style={legacyModalLabel}>No. in Group:</label>
-              <input type="text" value={modalData.noInGroup} onChange={e => setModalData({ ...modalData, noInGroup: e.target.value })} style={legacyModalInput} />
+            <div className="flex items-center gap-2 mb-4">
+              <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">No. in Group:</label>
+              <TextField type="text" value={modalData.noInGroup} onChange={e => setModalData({ ...modalData, noInGroup: e.target.value })} size="small" fullWidth variant="outlined" inputProps={{ style: { fontSize: 14, padding: '3px 6px' } }} />
             </div>
-            <div style={{ marginBottom: 8 }}>
-              <label style={legacyModalLabel}>{modalType === 'caller' ? 'CallerID:' : 'CalleeID:'}</label>
-              <input type="text" value={modalData.idValue} onChange={e => setModalData({ ...modalData, idValue: e.target.value })} style={legacyModalInput} />
-            </div>
-            <div style={legacyModalButtonBar}>
-              <button style={legacySaveButton} onClick={handleSave}>Save</button>
-              <button style={legacyCloseButton} onClick={() => setShowModal(false)}>Close</button>
+            <div className="flex items-center gap-2 mb-4">
+              <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">{modalType === 'caller' ? 'CallerID:' : 'CalleeID:'}</label>
+              <TextField type="text" value={modalData.idValue} onChange={e => setModalData({ ...modalData, idValue: e.target.value })} size="small" fullWidth variant="outlined" inputProps={{ style: { fontSize: 14, padding: '3px 6px' } }} />
             </div>
           </div>
-        </div>
-      )}
+        </DialogContent>
+        <DialogActions className="p-6 pt-2 justify-center gap-6">
+          <button className="bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white font-semibold text-base rounded px-8 py-2 min-w-[100px] shadow hover:from-[#0e8fd6] hover:to-[#3bb6f5]" onClick={handleSave}>Save</button>
+          <button className="bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white font-semibold text-base rounded px-8 py-2 min-w-[100px] shadow hover:from-[#0e8fd6] hover:to-[#3bb6f5]" onClick={() => setShowModal(false)}>Cancel</button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

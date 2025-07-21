@@ -1,115 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { SIP_MEDIA_FIELDS, SIP_MEDIA_CODEC_FIELD, SIP_MEDIA_INITIAL_FORM } from '../constants/SipMediaconstants';
-
-const blueBarStyle = {
-  width: '100%',
-  height: 36,
-  background: 'linear-gradient(to bottom, #b3e0ff 0%, #6ec1f7 50%, #3b8fd6 100%)',
-  borderTopLeftRadius: 8,
-  borderTopRightRadius: 8,
-  marginBottom: 0,
-  display: 'flex',
-  alignItems: 'center',
-  fontWeight: 600,
-  fontSize: 20,
-  color: '#2266aa',
-  justifyContent: 'center',
-  boxShadow: '0 2px 8px 0 rgba(80,160,255,0.10)',
-  borderBottom: '2px solid #888',
-};
-const panelStyle = {
-  background: '#fff',
-  border: '2px solid #888',
-  borderRadius: 8,
-  maxWidth: 1100,
-  margin: '32px auto 0 auto',
-  boxSizing: 'border-box',
-  padding: 0,
-  position: 'relative',
-};
-const formBodyStyle = {
-  display: 'flex',
-  flexDirection: 'column',
-  padding: '36px 40px 24px 40px',
-  background: '#fff',
-  borderBottomLeftRadius: 8,
-  borderBottomRightRadius: 8,
-};
-const rowStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  marginBottom: 18,
-  minHeight: 38,
-  gap: 280,
-};
-const labelStyle = {
-  width: 340,
-  fontSize: 16,
-  color: '#222',
-  textAlign: 'left',
-  marginRight: 0,
-  paddingLeft: 150,
-  whiteSpace: 'nowrap',
-  fontWeight: 400,
-};
-const inputStyle = {
-  fontSize: 16,
-  padding: '8px 12px',
-  borderRadius: 4,
-  border: '1px solid #bbb',
-  background: '#fff',
-  boxSizing: 'border-box',
-  width: 220,
-};
-const codecRowStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  marginTop: 32,
-  marginBottom: 0,
-};
-const codecLabelStyle = {
-  ...labelStyle,
-  fontWeight: 400,
-  color: '#444',
-  textAlign: 'left',
-  width: 340,
-};
-const buttonRowStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-  gap: 48,
-  padding: '36px 0 36px 0',
-};
-const buttonStyle = {
-  background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
-  color: '#fff',
-  fontSize: 18,
-  padding: '7px 38px',
-  border: 'none',
-  borderRadius: 6,
-  boxShadow: '0 2px 4px rgba(0,0,0,0.10)',
-  cursor: 'pointer',
-  minWidth: 120,
-  transition: 'background 0.2s, box-shadow 0.2s',
-};
-const buttonGrayStyle = {
-  ...buttonStyle,
-  background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
-  color: '#fff',
-};
+import { TextField, Select, MenuItem, Button, InputLabel, FormControl } from '@mui/material';
 
 const SipMediaPage = () => {
   const [formData, setFormData] = useState(SIP_MEDIA_INITIAL_FORM);
-  const [savedData, setSavedData] = useState(SIP_MEDIA_INITIAL_FORM);
-
-  // On mount, load from localStorage if available
-  useEffect(() => {
-    const saved = localStorage.getItem('sipMediaParams');
-    if (saved) {
-      setFormData(JSON.parse(saved));
-      setSavedData(JSON.parse(saved));
-    }
-  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -117,69 +11,84 @@ const SipMediaPage = () => {
   };
 
   const handleSave = () => {
-    setSavedData(formData);
-    localStorage.setItem('sipMediaParams', JSON.stringify(formData));
     alert('Your details are saved');
   };
 
   const handleReset = () => {
     setFormData(SIP_MEDIA_INITIAL_FORM);
-    setSavedData(SIP_MEDIA_INITIAL_FORM);
-    localStorage.setItem('sipMediaParams', JSON.stringify(SIP_MEDIA_INITIAL_FORM));
   };
 
   return (
-    <div style={{ background: '#fff', minHeight: '100vh', padding: 0 }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', paddingTop: 32 }}>
-        <div style={{ ...panelStyle, padding: 0 }}>
-          <div style={blueBarStyle}>Media Parameters</div>
-          <div style={formBodyStyle}>
+    <div className="bg-white min-h-[120vh] py-8 px-2 flex flex-col items-center">
+      <div className="w-full max-w-5xl mx-auto">
+        {/* Blue Bar */}
+        <div className="rounded-t-lg border-b-2 border-[#888] h-10 flex items-center justify-center font-semibold text-[20px] text-[#222] shadow-sm"
+          style={{background: 'linear-gradient(to bottom, #b3e0ff 0%, #6ec1f7 50%, #3b8fd6 100%)', boxShadow: '0 2px 8px 0 rgba(80,160,255,0.10)'}}>
+          Media Parameters
+        </div>
+        {/* Card */}
+        <div className="border-2 border-[#888] border-t-0 rounded-b-lg bg-white w-full py-6 md:py-10 px-4 md:px-8 flex flex-col gap-4 items-center">
             {SIP_MEDIA_FIELDS.map((field) => (
-              <div key={field.name} style={rowStyle}>
-                <label style={labelStyle}>{field.label}</label>
+            <div key={field.name} className="flex flex-col md:flex-row items-start md:items-center w-full max-w-3xl mx-auto mb-4">
+              <label className="md:w-1/2 w-full max-w-xs text-[16px] text-gray-800 text-left break-words md:pr-4 mb-1 md:mb-0">{field.label}:</label>
+              <div className="md:w-1/2 w-full max-w-xs md:ml-auto">
                 {field.type === 'select' ? (
-                  <select
+                  <FormControl size="small" className="w-full">
+                    <Select
                     name={field.name}
                     value={formData[field.name]}
                     onChange={handleInputChange}
-                    style={inputStyle}
+                      fullWidth
+                      variant="outlined"
+                      sx={{ fontSize: 16 }}
                   >
                     {field.options.map((option) => (
-                      <option key={option.value} value={option.value}>{option.label}</option>
+                        <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
                     ))}
-                  </select>
+                    </Select>
+                  </FormControl>
                 ) : (
-                  <input
+                  <TextField
                     type="text"
                     name={field.name}
                     value={formData[field.name]}
                     onChange={handleInputChange}
-                    style={inputStyle}
+                    size="small"
+                    fullWidth
+                    variant="outlined"
+                    sx={{ fontSize: 16 }}
                   />
                 )}
               </div>
-            ))}
-            <div style={rowStyle}>
-              <label style={labelStyle}>CODEC Setting</label>
             </div>
-            <div style={rowStyle}>
-              <label style={labelStyle}>Gateway Negotiation Coding Sequence</label>
-              <select
+          ))}
+          <div className="flex flex-col md:flex-row items-start md:items-center w-full max-w-3xl mx-auto mt-2">
+            <label className="md:w-1/2 w-full max-w-xs text-[16px] text-gray-800 text-left break-words md:pr-4 mb-1 md:mb-0">CODEC Setting:</label>
+          </div>
+          <div className="flex flex-col md:flex-row items-start md:items-center w-full max-w-3xl mx-auto">
+            <label className="md:w-1/2 w-full max-w-xs text-[16px] text-gray-800 text-left break-words md:pr-4 mb-1 md:mb-0">Gateway Negotiation Coding Sequence:</label>
+            <div className="md:w-1/2 w-full max-w-xs md:ml-auto">
+              <FormControl size="small" className="w-full">
+                <Select
                 name={SIP_MEDIA_CODEC_FIELD.name}
                 value={formData[SIP_MEDIA_CODEC_FIELD.name]}
                 onChange={handleInputChange}
-                style={{ ...inputStyle, width: 300 }}
+                  fullWidth
+                  variant="outlined"
+                  sx={{ fontSize: 16 }}
               >
                 {SIP_MEDIA_CODEC_FIELD.options.map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
+                    <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>
                 ))}
-              </select>
+                </Select>
+              </FormControl>
             </div>
           </div>
         </div>
-        <div style={buttonRowStyle}>
-          <button type="button" style={buttonStyle} onClick={handleSave}>Save</button>
-          <button type="button" style={buttonGrayStyle} onClick={handleReset}>Reset</button>
+        {/* Buttons */}
+        <div className="flex justify-center gap-8 mt-8 w-full">
+          <Button variant="contained" onClick={handleSave} sx={{background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600, fontSize: 18, borderRadius: 2, minWidth: 120, minHeight: 40, textTransform: 'none', boxShadow: '0 2px 8px #b3e0ff', '&:hover': {background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)'}}}>Save</Button>
+          <Button variant="contained" onClick={handleReset} sx={{background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600, fontSize: 18, borderRadius: 2, minWidth: 120, minHeight: 40, textTransform: 'none', boxShadow: '0 2px 8px #b3e0ff', '&:hover': {background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)'}}}>Reset</Button>
         </div>
       </div>
     </div>

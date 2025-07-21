@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { fetchPingtest } from '../api/apiService';
+import axios from 'axios';
 import {
   PING_TITLE,
   PING_LABELS,
@@ -35,6 +37,33 @@ const PINGTest = () => {
   const [count, setCount] = useState('');
   const [length, setLength] = useState('');
   const [info, setInfo] = useState('');
+  const [error, setError] = useState(false);
+
+  const handlePing = async () => {
+    setError(false);
+    setInfo('');
+    try {
+      const Apiresponse = await axios.post(
+        "http://192.168.1.90:5000/api/ping-test",
+        {
+          destIp,
+          count,
+          length,
+          sourceIp,
+        }
+      );
+      console.log(Apiresponse)
+      if (Apiresponse.data.response) {
+        setInfo(Apiresponse.data.responseData);
+        
+      } else {
+        setInfo(Apiresponse.data.message);
+      }
+    } catch (err) {
+      alert("Internal Server Error")
+      setError(true);
+    }
+  };
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center py-6 px-2">
@@ -80,7 +109,7 @@ const PINGTest = () => {
           </form>
           {/* Buttons Row */}
           <div className="w-full flex flex-row justify-center gap-12 mb-8">
-            <Button variant="contained" sx={buttonSx}>{PING_BUTTONS.start}</Button>
+            <Button variant="contained" sx={buttonSx} onClick={handlePing}>{PING_BUTTONS.start}</Button>
             <Button variant="contained" sx={buttonSx}>{PING_BUTTONS.end}</Button>
           </div>
           {/* Info Section */}
@@ -98,5 +127,8 @@ const PINGTest = () => {
     </div>
   );
 };
+
+
+
 
 export default PINGTest; 

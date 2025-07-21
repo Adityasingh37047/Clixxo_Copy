@@ -1,20 +1,23 @@
 import React, { useState } from 'react';
 import { IPTABLES_INFO, ACCESS_CONTROL_BUTTONS } from '../constants/AccessControlConstants';
-import { Button } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 
-const buttonSx = {
+const blueButtonSx = {
   background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
   color: '#fff',
-  fontSize: 18,
-  px: 6,
-  py: 1.5,
-  borderRadius: 2,
+  fontWeight: 600,
+  fontSize: 16,
+  borderRadius: 1.5,
   minWidth: 120,
-  boxShadow: '0 2px 8px #b3e0ff',
-  fontWeight: 500,
-  mr: 2,
+  boxShadow: '0 2px 6px #0002',
+  textTransform: 'none',
+  px: 3,
+  py: 1.5,
+  padding: '6px 28px',
+  border: '1px solid #0e8fd6',
   '&:hover': {
     background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+    color: '#fff',
   },
 };
 
@@ -41,7 +44,7 @@ const AccessControl = () => {
         <div className="flex flex-row gap-6 justify-center items-center">
           <Button
             variant="contained"
-            sx={buttonSx}
+            sx={blueButtonSx}
             onClick={handleApply}
             disabled={!editMode}
           >
@@ -49,7 +52,7 @@ const AccessControl = () => {
           </Button>
           <Button
             variant="contained"
-            sx={buttonSx}
+            sx={blueButtonSx}
             onClick={handleAddNew}
             disabled={editMode}
           >
@@ -60,20 +63,53 @@ const AccessControl = () => {
       {/* Iptables Info */}
       <div className="flex flex-col items-center w-full">
         <div className="text-gray-500 text-base font-normal mb-2 ml-2 w-full max-w-[700px] text-left">Iptables Info</div>
-        <div
-          className="w-full max-w-[700px] bg-white border border-gray-400 rounded-md shadow-sm overflow-y-auto"
-          style={{ minHeight: 180, maxHeight: 260, fontFamily: 'monospace', fontSize: 15, padding: 16, whiteSpace: 'pre', resize: 'none' }}
-        >
+        <div className="w-full max-w-[700px] bg-white border border-gray-400 rounded-md shadow-sm overflow-y-auto p-4" style={{ minHeight: 180, maxHeight: 260 }}>
           {editMode ? (
-            <textarea
-              className="w-full h-full bg-white border-none outline-none resize-none"
-              style={{ minHeight: 140, maxHeight: 220, fontFamily: 'monospace', fontSize: 15, background: 'white', color: '#222' }}
+            <TextField
+              className="w-full"
+              multiline
+              minRows={7}
+              maxRows={12}
               value={textareaValue}
               onChange={e => setTextareaValue(e.target.value)}
               autoFocus
+              variant="outlined"
+              size="small"
+              fullWidth
+              inputProps={{
+                style: {
+                  fontFamily: 'monospace',
+                  fontSize: 15,
+                  background: 'white',
+                  color: '#222',
+                  padding: '8px 10px',
+                  resize: 'none',
+                },
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  fontFamily: 'monospace',
+                  fontSize: 15,
+                  background: 'white',
+                  color: '#222',
+                  padding: 0,
+                  border: 'none',
+                  borderRadius: 0,
+                  boxShadow: 'none',
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  border: 'none',
+                },
+                '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  border: 'none',
+                },
+                '& .MuiOutlinedInput-input': {
+                  outline: 'none',
+                },
+              }}
             />
           ) : (
-            iptablesInfo
+            <pre className="w-full h-full bg-white text-gray-800 text-[15px] font-mono whitespace-pre-wrap m-0 p-0" style={{ minHeight: 140, maxHeight: 220 }}>{iptablesInfo}</pre>
           )}
         </div>
       </div>

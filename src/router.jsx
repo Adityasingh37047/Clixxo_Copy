@@ -4,7 +4,7 @@ import Layout from './components/Layout';
 import { ROUTE_PATHS } from './constants/routeConstatns';
 import SystemInfo from './components/SystemInfo';
 import PstnStatus from './components/PstnStatus';
-import PsmInfo from './components/PsmInfo';
+import PcmInfo from './components/PcmInfo';
 import CallCount from './components/CallCount';
 import WarningInfo from './components/WarningInfo';
 import SipPage from './components/SipPage';
@@ -150,7 +150,7 @@ export const router = createBrowserRouter([
       },
       {
         path: ROUTE_PATHS.PSM_INFO,
-        element: <PsmInfo />,
+        element: <PcmInfo />,
       },
       {
         path: ROUTE_PATHS.CALL_COUNT,

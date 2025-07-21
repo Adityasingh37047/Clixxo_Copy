@@ -7,6 +7,14 @@ import {
   PCM_TRUNK_INITIAL_FORM,
   PCM_TRUNK_ITEMS_PER_PAGE
 } from '../constants/PcmTrunkConstants';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Checkbox from '@mui/material/Checkbox';
 
 const LOCAL_STORAGE_KEY = 'pcm_trunks';
 const modalOverlayStyle = {
@@ -84,10 +92,7 @@ const pageSelectStyle = {
 };
 
 const PcmTrunkPage = () => {
-  const [trunks, setTrunks] = useState(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [trunks, setTrunks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form, setForm] = useState(PCM_TRUNK_INITIAL_FORM);
   const [checkAll, setCheckAll] = useState(true);
@@ -131,7 +136,6 @@ const PcmTrunkPage = () => {
       } else {
         updated = [...prev, form];
       }
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
       return updated;
     });
     setIsModalOpen(false);
@@ -150,166 +154,229 @@ const PcmTrunkPage = () => {
     const newTrunks = trunks.filter((_, idx) => !selected.includes(idx));
     setTrunks(newTrunks);
     setSelected([]);
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newTrunks));
   };
   const handleClearAll = () => {
     setTrunks([]);
     setSelected([]);
     setPage(1);
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
   };
   const handlePageChange = (newPage) => setPage(Math.max(1, Math.min(totalPages, newPage)));
 
   // UI
   return (
-    <div style={{ background: '#fff', minHeight: '100vh', padding: 0, margin: 0 }}>
+    <div className="bg-white min-h-[calc(100vh-128px)] flex flex-col items-center box-border">
       {trunks.length === 0 ? (
-        <div style={{ textAlign: 'center', marginTop: 48 }}>
-          <div style={{ color: '#222', fontSize: 22, marginBottom: 32 }}>No available PCM trunk!</div>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
-            <button
-              style={{
+        <div className="flex flex-1 flex-col items-center justify-center w-full h-full min-h-[calc(100vh-128px)]">
+          <div className="text-gray-800 text-2xl mb-6">No available PCM trunk!</div>
+          <div className="flex flex-row gap-4">
+            <Button
+              variant="contained"
+              sx={{
                 background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
                 color: '#fff',
                 fontWeight: 600,
-                fontSize: 16,
-                border: '1.2px solid #1976d2',
-                borderRadius: 6,
-                padding: '7px 32px',
-                minWidth: 120,
-                boxShadow: '0 2px 6px #0002',
-                cursor: 'pointer',
-                marginRight: 0
+                fontSize: '18px',
+                borderRadius: 2,
+                minWidth: 140,
+                minHeight: 48,
+                px: 2,
+                py: 0.5,
+                boxShadow: '0 2px 8px #b3e0ff',
+                textTransform: 'none',
+                '&:hover': {
+                  background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+                  color: '#fff',
+                },
               }}
               onClick={() => handleOpenModal()}
             >
               Add New
-            </button>
-            <button
-              style={{
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
                 background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
                 color: '#fff',
                 fontWeight: 600,
-                fontSize: 16,
-                border: '1.2px solid #1976d2',
-                borderRadius: 6,
-                padding: '7px 32px',
-                minWidth: 120,
-                boxShadow: '0 2px 6px #0002',
-                cursor: 'pointer',
-                marginLeft: 0
+                fontSize: '18px',
+                borderRadius: 2,
+                minWidth: 140,
+                minHeight: 48,
+                px: 2,
+                py: 0.5,
+                boxShadow: '0 2px 8px #b3e0ff',
+                textTransform: 'none',
+                '&:hover': {
+                  background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+                  color: '#fff',
+                },
               }}
+              // TODO: Implement batch add logic if needed
             >
               Batch Add
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ ...tableContainerStyle, borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottom: 'none', maxWidth: 1200, width: '100%' }}>
-            <div style={{ ...blueBarStyle, borderBottom: '2px solid #888' }}>PCM Trunks</div>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="w-full max-w-6xl mx-auto">
+          <div className="rounded-t-lg border-b-2 border-[#888] h-9 flex items-center justify-center font-semibold text-[18px] text-[#222] shadow-sm mt-8"
+            style={{background: 'linear-gradient(to bottom, #b3e0ff 0%, #6ec1f7 50%, #3b8fd6 100%)', boxShadow: '0 2px 8px 0 rgba(80,160,255,0.10)'}}>
+            PCM Trunks
+          </div>
+          <div className="overflow-x-auto w-full">
+            <table className="w-full min-w-[900px] bg-[#f8fafd] border-2 border-gray-400 rounded-b-lg shadow-sm">
               <thead>
                 <tr>
-                  <th style={thStyle}>Check</th>
-                  <th style={thStyle}>Index</th>
-                  <th style={thStyle}>PCM NO.</th>
-                  <th style={thStyle}>Including Ts</th>
-                  <th style={thStyle}>Modify</th>
+                  <th className="bg-white text-gray-800 font-semibold text-sm border border-gray-300 px-3 py-2 whitespace-nowrap">Check</th>
+                  <th className="bg-white text-gray-800 font-semibold text-sm border border-gray-300 px-3 py-2 whitespace-nowrap">Index</th>
+                  <th className="bg-white text-gray-800 font-semibold text-sm border border-gray-300 px-3 py-2 whitespace-nowrap">PCM NO.</th>
+                  <th className="bg-white text-gray-800 font-semibold text-sm border border-gray-300 px-3 py-2 whitespace-nowrap">Including Ts</th>
+                  <th className="bg-white text-gray-800 font-semibold text-sm border border-gray-300 px-3 py-2 whitespace-nowrap">Modify</th>
                 </tr>
               </thead>
               <tbody>
                 {pagedTrunks.map((trunk, idx) => (
                   <tr key={idx}>
-                    <td style={tdStyle}><input type="checkbox" checked={selected.includes((page - 1) * PCM_TRUNK_ITEMS_PER_PAGE + idx)} onChange={() => handleSelectRow(idx)} /></td>
-                    <td style={tdStyle}>{trunk.index}</td>
-                    <td style={tdStyle}>{trunk.pcmNo}</td>
-                    <td style={tdStyle}>{trunk.ts.map((checked, i) => checked ? i : null).filter(i => i !== null).join(',')}</td>
-                    <td style={tdStyle}>
-                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                        <button
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32 }}
+                    <td className="border border-gray-300 px-2 py-1 text-center"><Checkbox checked={selected.includes((page - 1) * PCM_TRUNK_ITEMS_PER_PAGE + idx)} onChange={() => handleSelectRow(idx)} /></td>
+                    <td className="border border-gray-300 px-2 py-1 text-center">{trunk.index}</td>
+                    <td className="border border-gray-300 px-2 py-1 text-center">{trunk.pcmNo}</td>
+                    <td className="border border-gray-300 px-2 py-1 text-center">{trunk.ts.map((checked, i) => checked ? i : null).filter(i => i !== null).join(',')}</td>
+                    <td className="border border-gray-300 px-2 py-1 text-center">
+                      <Button
                           onClick={() => handleOpenModal(trunk, idx)}
-                          className="edit-icon-btn"
+                        sx={{ minWidth: 0, p: 0, borderRadius: 1 }}
                         >
                           <EditDocumentIcon style={{ fontSize: 28, color: '#0e8fd6', transition: 'color 0.2s, transform 0.2s' }} />
-                        </button>
-                      </div>
+                      </Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <div style={{ width: '100%', maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#e3e7ef', borderRadius: 8, border: '1px solid #d3d3d3', borderTop: 'none', marginTop: 0, padding: '8px 8px 8px 8px' }}>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button style={tableButtonStyle} onClick={handleCheckAllRows}>Check All</button>
-              <button style={tableButtonStyle} onClick={handleUncheckAllRows}>Uncheck All</button>
-              <button style={tableButtonStyle} onClick={handleInverse}>Inverse</button>
-              <button style={tableButtonStyle} onClick={handleDelete}>Delete</button>
-              <button style={tableButtonStyle} onClick={handleClearAll}>Clear All</button>
+          {/* Table controls */}
+          <div className="flex flex-wrap justify-between items-center bg-[#e3e7ef] rounded-b-lg border border-t-0 border-gray-300 px-2 py-2 gap-2">
+            <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleCheckAllRows}>Check All</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleUncheckAllRows}>Uncheck All</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleInverse}>Inverse</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleDelete}>Delete</button>
+              <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-sm rounded px-4 py-2 min-w-[110px] shadow hover:from-gray-300 hover:to-gray-200" onClick={handleClearAll}>Clear All</button>
             </div>
-            <button style={addNewTableButtonStyle} onClick={() => handleOpenModal()}>Add New</button>
+            <button className="bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white font-semibold text-base rounded px-6 py-2 min-w-[120px] shadow hover:from-[#0e8fd6] hover:to-[#3bb6f5]" onClick={() => handleOpenModal()}>Add New</button>
           </div>
-          <div style={{ width: '100%', maxWidth: 1200, margin: '0 auto', background: '#e3e7ef', borderRadius: 8, border: '1px solid #d3d3d3', borderTop: 'none', marginTop: 4, padding: '2px 8px 2px 8px', display: 'flex', alignItems: 'center', gap: 8, minHeight: 32 }}>
+          {/* Pagination */}
+          <div className="flex flex-wrap items-center gap-2 w-full max-w-7xl mx-auto bg-gray-200 rounded-lg border border-gray-300 border-t-0 mt-1 p-2 text-sm text-gray-700">
             <span>{trunks.length} items Total</span>
-            <span style={{marginLeft:'8px'}}>{PCM_TRUNK_ITEMS_PER_PAGE} Items/Page</span>
-            <span style={{flexGrow: 1}}></span>
+            <span>{PCM_TRUNK_ITEMS_PER_PAGE} Items/Page</span>
             <span>{page}/{totalPages}</span>
-            <button style={paginationButtonStyle} onClick={() => handlePageChange(1)} disabled={page === 1}>First</button>
-            <button style={paginationButtonStyle} onClick={() => handlePageChange(page - 1)} disabled={page === 1}>Previous</button>
-            <button style={paginationButtonStyle} onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>Next</button>
-            <button style={paginationButtonStyle} onClick={() => handlePageChange(totalPages)} disabled={page === totalPages}>Last</button>
+            <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-xs rounded px-3 py-1 min-w-[60px] shadow disabled:bg-gray-100 disabled:text-gray-400" onClick={() => handlePageChange(1)} disabled={page === 1}>First</button>
+            <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-xs rounded px-3 py-1 min-w-[60px] shadow disabled:bg-gray-100 disabled:text-gray-400" onClick={() => handlePageChange(page - 1)} disabled={page === 1}>Previous</button>
+            <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-xs rounded px-3 py-1 min-w-[60px] shadow disabled:bg-gray-100 disabled:text-gray-400" onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>Next</button>
+            <button className="bg-gradient-to-b from-gray-200 to-gray-300 text-gray-800 font-semibold text-xs rounded px-3 py-1 min-w-[60px] shadow disabled:bg-gray-100 disabled:text-gray-400" onClick={() => handlePageChange(totalPages)} disabled={page === totalPages}>Last</button>
             <span>Go to Page</span>
-            <select style={pageSelectStyle} value={page} onChange={e => handlePageChange(Number(e.target.value))}>
-              {Array.from({ length: totalPages }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
+            <select className="text-xs rounded border border-gray-300 px-2 py-1 min-w-[48px]" value={page} onChange={e => handlePageChange(Number(e.target.value))}>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <option key={i + 1} value={i + 1}>{i + 1}</option>
+              ))}
             </select>
             <span>{totalPages} Pages Total</span>
           </div>
         </div>
       )}
-      {isModalOpen && (
-        <div style={modalOverlayStyle}>
-          <div style={modalStyle}>
-            <div style={modalHeaderStyle}>PCM Trunk</div>
-            <div style={modalBodyStyle}>
+      {/* Modal Dialog */}
+      <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="xs" fullWidth>
+        <DialogTitle className="bg-gradient-to-b from-[#23272b] to-[#6e7a8a] text-white text-center font-semibold text-lg">PCM Trunk</DialogTitle>
+        <DialogContent className="bg-[#f8fafd] flex flex-col gap-2 py-4">
               {/* Index Block */}
-              <div style={{ background: '#fff', border: '1px solid #d3d3d3', borderRadius: 4, padding: '8px 12px', marginBottom: 10, width: '100%', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 18 }}>
-                <label style={{ fontWeight: 500, fontSize: 15, minWidth: 80, marginBottom: 0, marginRight: 8 }}>Index:</label>
-                <select value={form.index} onChange={e => handleFormChange('index', Number(e.target.value))} style={{ ...modalInputStyle, maxWidth: 120, height: 32, padding: '2px 8px', fontSize: 15, marginBottom: 0, minWidth: 0 }}>
-                  {PCM_TRUNK_INDEX_OPTIONS.map(i => <option key={i} value={i}>{i}</option>)}
-                </select>
+          <div className="flex flex-col sm:flex-row items-center border border-gray-200 rounded px-2 py-1 gap-2 w-full bg-white mb-2">
+            <label className="text-[15px] text-gray-700 font-medium whitespace-nowrap text-left min-w-[80px] mr-2">Index:</label>
+            <Select
+              value={form.index}
+              onChange={e => handleFormChange('index', Number(e.target.value))}
+              size="small"
+              fullWidth
+              variant="outlined"
+              className="bg-white"
+              sx={{ maxWidth: 120, minWidth: 0 }}
+            >
+              {PCM_TRUNK_INDEX_OPTIONS.map(i => <MenuItem key={i} value={i}>{i}</MenuItem>)}
+            </Select>
               </div>
               {/* PCM NO. Block */}
-              <div style={{ background: '#fff', border: '1px solid #d3d3d3', borderRadius: 4, padding: '8px 12px', marginBottom: 10, width: '100%', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 18 }}>
-                <label style={{ fontWeight: 500, fontSize: 15, minWidth: 80, marginBottom: 0, marginRight: 8 }}>PCM NO.:</label>
-                <select value={form.pcmNo} onChange={e => handleFormChange('pcmNo', Number(e.target.value))} style={{ ...modalInputStyle, maxWidth: 120, height: 32, padding: '2px 8px', fontSize: 15, marginBottom: 0, minWidth: 0 }}>
-                  {PCM_TRUNK_PCM_NO_OPTIONS.map(i => <option key={i} value={i}>{i}</option>)}
-                </select>
+          <div className="flex flex-col sm:flex-row items-center border border-gray-200 rounded px-2 py-1 gap-2 w-full bg-white mb-2">
+            <label className="text-[15px] text-gray-700 font-medium whitespace-nowrap text-left min-w-[80px] mr-2">PCM NO.:</label>
+            <Select
+              value={form.pcmNo}
+              onChange={e => handleFormChange('pcmNo', Number(e.target.value))}
+              size="small"
+              fullWidth
+              variant="outlined"
+              className="bg-white"
+              sx={{ maxWidth: 120, minWidth: 0 }}
+            >
+              {PCM_TRUNK_PCM_NO_OPTIONS.map(i => <MenuItem key={i} value={i}>{i}</MenuItem>)}
+            </Select>
               </div>
               {/* Including Ts Block */}
-              <div style={{ background: '#fff', border: '1px solid #d3d3d3', borderRadius: 4, padding: '8px 12px', marginBottom: 10, width: '100%', boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <label style={{ fontWeight: 500, fontSize: 15, minWidth: 80, marginBottom: 0 }}>Including Ts:</label>
-                <input type="checkbox" checked={checkAll} onChange={handleCheckAllTs} style={{ marginRight: 8 }} />
-                <span style={{ fontWeight: 500 }}>Check All</span>
+          <div className="flex flex-col sm:flex-row items-center border border-gray-200 rounded px-2 py-1 gap-2 w-full bg-white mb-2">
+            <label className="text-[15px] text-gray-700 font-medium whitespace-nowrap text-left min-w-[80px] mr-2">Including Ts:</label>
+            <Checkbox checked={checkAll} onChange={handleCheckAllTs} sx={{ mr: 1 }} />
+            <span className="font-medium">Check All</span>
               </div>
               {/* TS Checkboxes Block */}
-              <div style={{ background: '#fff', border: '1px solid #d3d3d3', borderRadius: 4, padding: 8, marginBottom: 8, width: '100%', boxSizing: 'border-box', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0 }}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 border border-gray-200 rounded bg-white p-2 mb-2 w-full">
                 {form.ts.map((checked, idx) => (
-                  <label key={idx} style={{ display: 'flex', alignItems: 'center', fontSize: 14, fontWeight: 500, marginBottom: 0, padding: '2px 0', minHeight: 28, borderBottom: (idx % 4 === 3 && idx !== 31) ? '1px solid #eee' : 'none', borderRight: (idx % 4 !== 3) ? '1px solid #eee' : 'none', paddingLeft: 4 }}>
-                    <input type="checkbox" checked={checked} onChange={() => handleTSChange(idx)} style={{ marginRight: 4 }} />
+              <label key={idx} className="flex items-center text-[14px] font-medium mb-0 py-1 min-h-[28px] border-b border-r border-gray-100 last:border-b-0 last:border-r-0 pl-1">
+                <Checkbox checked={checked} onChange={() => handleTSChange(idx)} sx={{ p: 0.5, mr: 1 }} />
                     TS[{idx}]
                   </label>
                 ))}
               </div>
-            </div>
-            <div style={modalFooterStyle}>
-              <button onClick={handleSave} style={modalButtonStyle}>Save</button>
-              <button onClick={handleCloseModal} style={modalButtonGrayStyle}>Close</button>
-            </div>
-          </div>
-        </div>
-      )}
+        </DialogContent>
+        <DialogActions className="flex justify-center gap-6 pb-4">
+          <Button
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
+              color: '#fff',
+              fontWeight: 600,
+              fontSize: '16px',
+              borderRadius: 1,
+              minWidth: 100,
+              boxShadow: '0 2px 8px #b3e0ff',
+              textTransform: 'none',
+              '&:hover': {
+                background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+                color: '#fff',
+              },
+            }}
+            onClick={handleSave}
+          >
+            Save
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
+              color: '#fff',
+              fontWeight: 600,
+              fontSize: '16px',
+              borderRadius: 1,
+              minWidth: 100,
+              boxShadow: '0 2px 8px #b3e0ff',
+              textTransform: 'none',
+              '&:hover': {
+                background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+                color: '#fff',
+              },
+            }}
+            onClick={handleCloseModal}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

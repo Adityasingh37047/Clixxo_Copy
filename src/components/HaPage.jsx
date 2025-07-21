@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import { HA_DEFAULTS, HA_PRIMARY_BACKUP_OPTIONS, HA_ETH_OPTIONS, HA_LABELS } from '../constants/HaConstants';
 
 const HaPage = () => {
@@ -31,13 +33,16 @@ const HaPage = () => {
               <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 px-0 md:px-8">
                 <label className="w-full md:w-[220px] text-base text-gray-800 font-medium mb-2 md:mb-0">{HA_LABELS.ha}</label>
                 <div className="flex items-center w-full md:w-auto ml-0 md:ml-[200px]">
-                  <input
-                    type="checkbox"
+                  <FormControlLabel
+                    control={
+                      <Checkbox
                     checked={enabled}
                     onChange={() => setEnabled(prev => !prev)}
-                    className="w-[18px] h-[18px] mr-2 accent-gray-600 border border-gray-600 bg-white"
+                        sx={{ color: '#6b7280', '&.Mui-checked': { color: '#6b7280' } }}
+                      />
+                    }
+                    label={<span className="text-base ml-2">Enable</span>}
                   />
-                  <span className="text-base ml-2">Enable</span>
                 </div>
               </div>
               <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-0 px-0 md:px-8">

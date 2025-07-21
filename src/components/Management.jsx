@@ -2,43 +2,23 @@ import React, { useState } from 'react';
 import { MANAGEMENT_SECTIONS, MANAGEMENT_INITIAL_FORM } from '../constants/ManagementConstants';
 import { Button, Select, MenuItem, RadioGroup, FormControlLabel, Radio, Checkbox, TextField } from '@mui/material';
 
-const blueBarStyle = {
-  width: '100%',
-  maxWidth: 1100,
-  height: 38,
-  background: 'linear-gradient(to bottom, #b3e0ff 0%, #6ec1f7 60%, #3b8fd6 100%)',
-  borderTopLeftRadius: 16,
-  borderTopRightRadius: 16,
-  borderBottomLeftRadius: 0,
-  borderBottomRightRadius: 0,
-  margin: '10px',
-  marginBottom: 0,
-  display: 'flex',
-  alignItems: 'center',
+const blueButtonSx = {
+  background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
+  color: '#fff',
   fontWeight: 600,
-  fontSize: 20,
-  color: '#222',
-  justifyContent: 'center',
-  boxShadow: '0 2px 8px 0 rgba(80,160,255,0.10)',
-  
-};
-
-const formContainerStyle = {
-  background: '#fff',
-  border: '2px solid #222',
-  borderTopLeftRadius: 0,
-  borderTopRightRadius: 0,
-  borderBottomLeftRadius: 16,
-  borderBottomRightRadius: 16,
-  width: '100%',
-  maxWidth: 1100,
-  margin: '0 auto',
-  padding: '0 0 40px 0',
-  minHeight: 320,
-  display: 'flex',
-  flexDirection: 'column',
-  overflow: 'hidden',
-  borderTop: 'none',
+  fontSize: 16,
+  borderRadius: 1.5,
+  minWidth: 120,
+  boxShadow: '0 2px 6px #0002',
+  textTransform: 'none',
+  px: 3,
+  py: 1.5,
+  padding: '6px 28px',
+  border: '1px solid #0e8fd6',
+  '&:hover': {
+    background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+    color: '#fff',
+  },
 };
 
 const Management = () => {
@@ -55,6 +35,7 @@ const Management = () => {
 
   const handleSave = (e) => {
     e.preventDefault();
+    // Implement save logic here
     alert('Settings saved!');
   };
 
@@ -69,7 +50,16 @@ const Management = () => {
       <div className="flex items-center text-base text-gray-800 text-left pl-4 whitespace-nowrap min-h-[36px]">
         {field.label}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full">
+        <div className="flex flex-row items-center gap-2">
+          <Checkbox
+            name={nextField.name}
+            checked={!!form[nextField.name]}
+            onChange={handleChange}
+            size="small"
+          />
+          <span className="text-base text-gray-800 mr-2">{nextField.label}</span>
+        </div>
         <TextField
           variant="outlined"
           size="small"
@@ -77,27 +67,22 @@ const Management = () => {
           type="datetime-local"
           value={form[field.name] ? form[field.name].replace(' ', 'T') : ''}
           onChange={handleChange}
-          className="bg-white"
-          sx={{ minWidth: 220, maxWidth: 260 }}
+          className="bg-white w-full sm:w-auto"
+          sx={{ minWidth: 0, maxWidth: 260, flex: 1 }}
           InputProps={{ readOnly: !form[nextField.name] }}
         />
-        <Checkbox
-          name={nextField.name}
-          checked={!!form[nextField.name]}
-          onChange={handleChange}
-          size="small"
-        />
-        <span className="text-base text-gray-800 mr-2">{nextField.label}</span>
       </div>
     </>
   );
 
   return (
     <div className="bg-white min-h-[calc(100vh-80px)] p-4 flex flex-col items-center">
-      <div style={blueBarStyle}>Management Parameters</div>
-      <div style={formContainerStyle}>
-        <form key={formKey} onSubmit={handleSave} className="w-full flex justify-center pt-6">
-          <div className="w-full" style={{ maxWidth: 1000 }}>
+      <div className="w-full max-w-4xl mx-auto">
+        <div className="w-full bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] h-10 flex items-center justify-center font-semibold text-lg text-black shadow mb-0 border-t-2 border-x-2 border-gray-400 rounded-t-xl">
+          Management Parameters
+        </div>
+        <form key={formKey} onSubmit={handleSave} className="w-full bg-white border-x-2 border-b-2 border-gray-400 rounded-b-xl flex flex-col gap-0 px-2 md:px-8 py-6">
+          <div className="w-full max-w-3xl mx-auto">
             {MANAGEMENT_SECTIONS.map((section, idx) => (
               <div key={section.section} className="w-full mb-8">
                 <div className="font-bold text-lg text-gray-700 mb-2 mt-2 ml-2 md:ml-8">{section.section}</div>
@@ -207,52 +192,24 @@ const Management = () => {
             ))}
           </div>
         </form>
-      </div>
-      <div className="flex flex-col sm:flex-row justify-center gap-8 mt-8" style={{ width: '100%', maxWidth: 1100 }}>
-        <Button
-          type="submit"
-          variant="contained"
-          onClick={handleSave}
-          sx={{
-            background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
-            color: '#fff',
-            fontSize: 18,
-            px: 6,
-            py: 1.5,
-            borderRadius: 2,
-            minWidth: 120,
-            boxShadow: '0 2px 8px #b3e0ff',
-            fontWeight: 500,
-            mr: 2,
-            '&:hover': {
-              background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
-            },
-          }}
-        >
-          Save
-        </Button>
-        <Button
-          type="button"
-          variant="contained"
-          onClick={handleReset}
-          sx={{
-            background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
-            color: '#fff',
-            fontSize: 18,
-            px: 6,
-            py: 1.5,
-            borderRadius: 2,
-            minWidth: 120,
-            boxShadow: '0 2px 8px #b3e0ff',
-            fontWeight: 500,
-            ml: 2,
-            '&:hover': {
-              background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
-            },
-          }}
-        >
-          Reset
-        </Button>
+        <div className="flex flex-col sm:flex-row justify-center gap-8 mt-8 w-full max-w-3xl mx-auto">
+          <Button
+            type="submit"
+            variant="contained"
+            sx={blueButtonSx}
+            onClick={handleSave}
+          >
+            Save
+          </Button>
+          <Button
+            type="button"
+            variant="contained"
+            onClick={handleReset}
+            sx={blueButtonSx}
+          >
+            Reset
+          </Button>
+        </div>
       </div>
     </div>
   );

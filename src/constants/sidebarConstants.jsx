@@ -32,8 +32,8 @@ export const SIDEBAR_SECTIONS = [
         path: ROUTE_PATHS.PSTN_STATUS 
       },
       { 
-        id: 'psmInfo', 
-        title: 'PSM Info',
+        id: 'pcmInfo', 
+        title: 'PCM Info',
         path: ROUTE_PATHS.PSM_INFO 
       },
       { 

@@ -1,99 +1,69 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { IP_CALL_IN_CALLEEID_FIELDS, IP_CALL_IN_CALLEEID_TABLE_COLUMNS, IP_CALL_IN_CALLEEID_INITIAL_FORM } from '../constants/IPCallInCalleeIDConstants';
 import EditDocumentIcon from '@mui/icons-material/EditDocument';
-
-const modalOverlayStyle = {
-  position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
-};
-const modalStyle = {
-  background: '#f8fafd',
-  border: '2px solid #222',
-  borderRadius: 6,
-  width: 440,
-  maxWidth: '95vw',
-  maxHeight: 'calc(100vh - 120px)',
-  marginTop: 80,
-  overflowY: 'auto',
-  boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
-  display: 'flex',
-  flexDirection: 'column',
-};
-const modalHeaderStyle = {
-  background: 'linear-gradient(to bottom, #23272b 0%, #6e7a8a 100%)', color: '#fff', fontWeight: 600, fontSize: 18, padding: '10px 0', textAlign: 'center', borderTopLeftRadius: 4, borderTopRightRadius: 4,
-};
-const modalBodyStyle = {
-  padding: '12px 8px 0 8px', display: 'flex', flexDirection: 'column', gap: 8,
-};
-const modalRowStyle = {
-  display: 'flex', alignItems: 'center', background: '#f4f6fa', border: '1px solid #c0c6cc', borderRadius: 4, padding: '6px 8px', marginBottom: 2, minHeight: 32, gap: 10,
-};
-const modalLabelStyle = {
-  width: 180, fontSize: 14, color: '#222', textAlign: 'left', marginRight: 10, whiteSpace: 'nowrap',
-};
-const modalInputStyle = {
-  width: '100%', fontSize: 14, padding: '3px 6px', borderRadius: 3, border: '1px solid #bbb', background: '#fff',
-};
-const modalFooterStyle = {
-  display: 'flex', justifyContent: 'center', gap: 24, padding: '18px 0',
-};
-const modalButtonStyle = {
-  background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontSize: 16, padding: '6px 32px', border: 'none', borderRadius: 4, boxShadow: '0 2px 4px rgba(0,0,0,0.10)', cursor: 'pointer', minWidth: 90,
-};
-const modalButtonGrayStyle = {
-  ...modalButtonStyle, background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)', color: '#222',
-};
-const blueBarStyle = {
-  width: '100%', height: 36, background: 'linear-gradient(to bottom, #b3e0ff 0%, #6ec1f7 50%, #3b8fd6 100%)', borderTopLeftRadius: 8, borderTopRightRadius: 8, marginBottom: 0, display: 'flex', alignItems: 'center', fontWeight: 600, fontSize: 18, color: '#2266aa', justifyContent: 'center', boxShadow: '0 2px 8px 0 rgba(80,160,255,0.10)',
-};
-const tableContainerStyle = {
-  width: '100%', maxWidth: '100%', margin: '0 auto', background: '#f8fafd', border: '2px solid #888', borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-};
-const tableStyle = {
-  width: '100%', borderCollapse: 'collapse',
-};
-const thStyle = {
-  background: '#fff', color: '#222', fontWeight: 600, fontSize: 15, border: '1px solid #bbb', padding: '6px 8px', whiteSpace: 'nowrap',
-};
-const tdStyle = {
-  border: '1px solid #bbb', padding: '6px 8px', fontSize: 14, background: '#fff', textAlign: 'center', whiteSpace: 'nowrap',
-};
-const tableButtonStyle = {
-  background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)', color: '#222', fontSize: 15, padding: '4px 18px', border: '1px solid #bbb', borderRadius: 6, boxShadow: '0 1px 2px rgba(0,0,0,0.10)', cursor: 'pointer', fontWeight: 500,
-};
-const addNewButtonStyle = {
-  ...tableButtonStyle, background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff',
-};
-const paginationBarStyle = {
-  display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: '#222', background: 'transparent', borderBottomLeftRadius: 8, borderBottomRightRadius: 8, borderTop: 'none', padding: '2px 8px', marginTop: 0, minHeight: 32,
-};
-const paginationButtonStyle = {
-  ...tableButtonStyle, fontSize: 13, padding: '2px 10px', minWidth: 0, borderRadius: 4,
-};
-const pageSelectStyle = {
-  fontSize: 13, padding: '2px 6px', borderRadius: 3, border: '1px solid #bbb', background: '#fff',
-};
-const customScrollbarRowStyle = {
-  width: '100%', margin: '0 auto', background: '#f4f6fa', display: 'flex', alignItems: 'center', height: 24, borderBottomLeftRadius: 8, borderBottomRightRadius: 8, border: '2px solid #888', borderTop: 'none', padding: '0 4px', boxSizing: 'border-box',
-};
-const customScrollbarTrackStyle = {
-  flex: 1, height: 12, background: '#e3e7ef', borderRadius: 8, position: 'relative', margin: '0 4px', overflow: 'hidden',
-};
-const customScrollbarThumbStyle = {
-  position: 'absolute', height: 12, background: '#888', borderRadius: 8, cursor: 'pointer', top: 0,
-};
-const customScrollbarArrowStyle = {
-  width: 18, height: 18, background: '#e3e7ef', border: '1px solid #bbb', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#888', cursor: 'pointer', userSelect: 'none',
-};
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select as MuiSelect, MenuItem, FormControl } from '@mui/material';
 
 const LOCAL_STORAGE_KEY = 'ipCallInCalleeIdRules';
+
+const grayButtonSx = {
+  background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)',
+  color: '#222',
+  fontWeight: 600,
+  fontSize: 15,
+  borderRadius: 1.5,
+  minWidth: 110,
+  boxShadow: '0 1px 2px rgba(0,0,0,0.10)',
+  textTransform: 'none',
+  px: 2.25,
+  py: 1,
+  padding: '4px 18px',
+  border: '1px solid #bbb',
+  '&:hover': {
+    background: 'linear-gradient(to bottom, #bfc6d1 0%, #e3e7ef 100%)',
+    color: '#222',
+  },
+};
+const blueButtonSx = {
+  background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
+  color: '#fff',
+  fontWeight: 600,
+  fontSize: 16,
+  borderRadius: 1.5,
+  minWidth: 120,
+  boxShadow: '0 2px 6px #0002',
+  textTransform: 'none',
+  px: 3,
+  py: 1.5,
+  padding: '6px 28px',
+  border: '1px solid #0e8fd6',
+  '&:hover': {
+    background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+    color: '#fff',
+  },
+};
+const paginationButtonSx = {
+  background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)',
+  color: '#222',
+  fontWeight: 600,
+  fontSize: 13,
+  borderRadius: 1.5,
+  minWidth: 60,
+  boxShadow: '0 1px 2px rgba(0,0,0,0.10)',
+  textTransform: 'none',
+  px: 1.25,
+  py: 0.5,
+  padding: '2px 10px',
+  border: '1px solid #bbb',
+  '&:hover': {
+    background: 'linear-gradient(to bottom, #bfc6d1 0%, #e3e7ef 100%)',
+    color: '#222',
+  },
+};
 
 const IPCallInCalleeID = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(IP_CALL_IN_CALLEEID_INITIAL_FORM);
-  const [rules, setRules] = useState(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [rules, setRules] = useState([]);
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 20;
@@ -160,147 +130,168 @@ const IPCallInCalleeID = () => {
   };
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(rules));
-  }, [rules]);
-
-  useEffect(() => {
     if (tableScrollRef.current) {
       setScrollState({ left: tableScrollRef.current.scrollLeft, width: tableScrollRef.current.clientWidth, scrollWidth: tableScrollRef.current.scrollWidth });
     }
   }, [rules, page]);
 
-  const rootStyle = {
-    background: '#fff',
-    minHeight: 'calc(100vh - 128px)',
-    padding: '40px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: rules.length === 0 ? 'center' : 'flex-start',
-    position: 'relative',
-    boxSizing: 'border-box',
-  };
-
   const thumbWidth = scrollState.width && scrollState.scrollWidth ? Math.max(40, (scrollState.width / scrollState.scrollWidth) * (scrollState.width - 8)) : 40;
   const thumbLeft = scrollState.width && scrollState.scrollWidth && scrollState.scrollWidth > scrollState.width ? ((scrollState.left / (scrollState.scrollWidth - scrollState.width)) * (scrollState.width - thumbWidth - 16)) : 0;
 
   return (
-    <div style={rootStyle}>
+    <div className="bg-white min-h-screen flex flex-col items-center p-2 md:p-8">
       {rules.length === 0 ? (
-        <div style={{ textAlign: 'center', marginBottom: '50vh' }}>
-          <div style={{ color: '#222', fontSize: 22, marginBottom: 32 }}>
-            No available number manipulation rule (IP Call In CalleeID)!
-          </div>
-          <button
-            style={{
-              background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
-              color: '#fff',
-              fontSize: 16,
-              padding: '7px 32px',
-              border: 'none',
-              borderRadius: 6,
-              boxShadow: '0 2px 4px rgba(0,0,0,0.10)',
-              cursor: 'pointer',
+        <div className="w-full h-full flex flex-col items-center justify-center" style={{ minHeight: '60vh' }}>
+          <div className="text-gray-800 text-2xl md:text-[22px] font-semibold mb-8 text-center">No available number manipulation rule (IP Call In CalleeID)!</div>
+          <Button
+            variant="contained"
+            sx={{
+              ...blueButtonSx,
+              minWidth: 140,
+              minHeight: 48,
+              fontSize: '18px',
+              fontWeight: 600,
+              px: 2,
+              py: 0.5,
+              boxShadow: '0 2px 8px #b3e0ff',
+              textTransform: 'none',
             }}
             onClick={() => handleOpenModal()}
-          >Add New</button>
+          >Add New</Button>
         </div>
       ) : (
-        <div style={{width:'100%'}}>
-          <div style={{ ...tableContainerStyle, borderBottomLeftRadius:0, borderBottomRightRadius:0, borderBottom:'none' }}>
-            <div style={{ ...blueBarStyle, borderBottom: '2px solid #888' }}>IP Call In CalleeID</div>
-            <div ref={tableScrollRef} onScroll={handleTableScroll} style={{overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
-              <table style={{...tableStyle, minWidth: IP_CALL_IN_CALLEEID_TABLE_COLUMNS.length * 170 }}>
-                <thead>
-                  <tr>{IP_CALL_IN_CALLEEID_TABLE_COLUMNS.map(c => <th key={c.key} style={thStyle}>{c.label}</th>)}</tr>
-                </thead>
-                <tbody>
-                  {pagedRules.map((item, idx) => {
-                    const realIdx = (page - 1) * itemsPerPage + idx;
-                    return (
-                      <tr key={realIdx}>
-                        <td style={tdStyle}><input type="checkbox" checked={selected.includes(realIdx)} onChange={() => handleSelectRow(idx)} /></td>
-                        <td style={tdStyle}>{item.index}</td>
-                        <td style={tdStyle}>{IP_CALL_IN_CALLEEID_FIELDS[1].options.find(opt => opt.value === item.callInitiator)?.label || item.callInitiator}</td>
-                        <td style={tdStyle}>{item.callerIdPrefix}</td>
-                        <td style={tdStyle}>{item.calleeIdPrefix}</td>
-                        <td style={tdStyle}>{item.withOriginalCalleeId}</td>
-                        <td style={tdStyle}>{item.strippedLeft}</td>
-                        <td style={tdStyle}>{item.strippedRight}</td>
-                        <td style={tdStyle}>{item.reservedRight}</td>
-                        <td style={tdStyle}>{item.prefixToAdd}</td>
-                        <td style={tdStyle}>{item.suffixToAdd}</td>
-                        <td style={tdStyle}>{item.description}</td>
-                        <td style={tdStyle}><EditDocumentIcon style={{ cursor: 'pointer', color: '#0e8fd6', display: 'block', margin: '0 auto' }} onClick={() => handleOpenModal(item, realIdx)} /></td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+        <>
+          <div className="w-full max-w-[1400px] mx-auto" style={{ border: '2px solid #bbb', borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+            <div className="w-full h-8 bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] flex items-center font-semibold text-[17px] text-[#222] justify-center shadow border-b-0 rounded-t-lg">
+              IP Call In CalleeID
+            </div>
+            <div className="overflow-x-auto w-full border-b border-gray-300" style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0, borderBottom: 'none' }}>
+              <div
+                ref={tableScrollRef}
+                onScroll={handleTableScroll}
+                style={{
+                  overflowX: 'auto',
+                  overflowY: 'auto',
+                  maxHeight: 240,
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                }}
+              >
+                <table className="w-full min-w-[1400px] border border-gray-300 border-collapse whitespace-nowrap" style={{ tableLayout: 'auto', border: '1px solid #bbb' }}>
+                  <thead>
+                    <tr style={{ minHeight: 32 }}>{IP_CALL_IN_CALLEEID_TABLE_COLUMNS.map(c => <th key={c.key} className="bg-white text-[#222] font-semibold text-[15px] border border-gray-300 text-center" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{c.label}</th>)}</tr>
+                  </thead>
+                  <tbody>
+                    {pagedRules.map((item, idx) => {
+                      const realIdx = (page - 1) * itemsPerPage + idx;
+                      return (
+                        <tr key={realIdx} style={{ minHeight: 32 }}>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}><input type="checkbox" checked={selected.includes(realIdx)} onChange={() => handleSelectRow(idx)} /></td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{item.index}</td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{IP_CALL_IN_CALLEEID_FIELDS[1].options.find(opt => opt.value === item.callInitiator)?.label || item.callInitiator}</td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{item.callerIdPrefix}</td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{item.calleeIdPrefix}</td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{item.withOriginalCalleeId}</td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{item.strippedLeft}</td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{item.strippedRight}</td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{item.reservedRight}</td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{item.prefixToAdd}</td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{item.suffixToAdd}</td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}>{item.description}</td>
+                          <td className="border border-gray-300 text-center bg-white" style={{ border: '1px solid #bbb', padding: '6px 8px', minHeight: 32, whiteSpace: 'nowrap' }}><EditDocumentIcon style={{ cursor: 'pointer', color: '#0e8fd6', display: 'block', margin: '0 auto' }} onClick={() => handleOpenModal(item, realIdx)} /></td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {/* Custom scrollbar row below the table */}
+            <div style={{ width: '100%', margin: '0 auto', background: '#f4f6fa', display: 'flex', alignItems: 'center', height: 24, borderBottomLeftRadius: 8, borderBottomRightRadius: 8, border: 'none', borderTop: 'none', padding: '0 4px', boxSizing: 'border-box' }}>
+              <div style={{ width: 18, height: 18, background: '#e3e7ef', border: '1px solid #bbb', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#888', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleArrowClick('left')}>&#9664;</div>
+              <div
+                style={{ flex: 1, height: 12, background: '#e3e7ef', borderRadius: 8, position: 'relative', margin: '0 4px', overflow: 'hidden' }}
+                onClick={handleScrollbarDrag}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    height: 12,
+                    background: '#888',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    top: 0,
+                    width: thumbWidth,
+                    left: thumbLeft,
+                  }}
+                  draggable
+                  onDrag={handleScrollbarDrag}
+                />
+              </div>
+              <div style={{ width: 18, height: 18, background: '#e3e7ef', border: '1px solid #bbb', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#888', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleArrowClick('right')}>&#9654;</div>
             </div>
           </div>
-          <div style={{ ...customScrollbarRowStyle, maxWidth: '100%' }}>
-            <div style={customScrollbarArrowStyle} onClick={() => handleArrowClick('left')}>&#9664;</div>
-            <div style={customScrollbarTrackStyle} onClick={handleScrollbarDrag} >
-              <div style={{ ...customScrollbarThumbStyle, width: thumbWidth, left: thumbLeft }} draggable onDrag={handleScrollbarDrag} />
+          {/* Action and pagination rows OUTSIDE the border, visually separated backgrounds and gap */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 w-full px-2 py-2" style={{ background: '#e3e7ef', marginTop: 12 }}>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="contained" sx={grayButtonSx} onClick={handleCheckAll}>Check All</Button>
+              <Button variant="contained" sx={grayButtonSx} onClick={handleUncheckAll}>Uncheck All</Button>
+              <Button variant="contained" sx={grayButtonSx} onClick={handleInverse}>Inverse</Button>
+              <Button variant="contained" sx={grayButtonSx} onClick={handleDelete}>Delete</Button>
+              <Button variant="contained" sx={grayButtonSx} onClick={handleClearAll}>Clear All</Button>
             </div>
-            <div style={customScrollbarArrowStyle} onClick={() => handleArrowClick('right')}>&#9654;</div>
+            <Button variant="contained" sx={blueButtonSx} onClick={() => handleOpenModal()}>Add New</Button>
           </div>
-          <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent', borderRadius: 8, border: '1px solid #bbb', borderTop: 'none', marginTop: 0, padding: '8px 8px 8px 8px' }}>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button style={tableButtonStyle} onClick={handleCheckAll}>Check All</button>
-              <button style={tableButtonStyle} onClick={handleUncheckAll}>Uncheck All</button>
-              <button style={tableButtonStyle} onClick={handleInverse}>Inverse</button>
-              <button style={tableButtonStyle} onClick={handleDelete}>Delete</button>
-              <button style={tableButtonStyle} onClick={handleClearAll}>Clear All</button>
-            </div>
-            <button style={{ ...addNewButtonStyle, position: 'static', margin: 0 }} onClick={() => handleOpenModal()}>Add New</button>
-          </div>
-          {/* Pagination bar moved below and left-aligned */}
-          <div style={{ width: '100%', maxWidth: '100%', margin: '0 auto', background: 'transparent', borderRadius: 8, border: 'none', borderTop: 'none', marginTop: 4, padding: '2px 8px 2px 8px', display: 'flex', alignItems: 'center', gap: 8, minHeight: 32, justifyContent: 'flex-start' }}>
+          <div className="flex flex-wrap items-center gap-2 w-full px-2 py-2 text-[15px]" style={{ background: '#e3e7ef', marginTop: 8 }}>
             <span>{rules.length} Items Total</span>
-            <span style={{marginLeft:'8px'}}>{itemsPerPage} Items/Page</span>
+            <span>{itemsPerPage} Items/Page</span>
             <span>{page}/{totalPages}</span>
-            <button style={paginationButtonStyle} onClick={() => handlePageChange(1)} disabled={page === 1}>First</button>
-            <button style={paginationButtonStyle} onClick={() => handlePageChange(page - 1)} disabled={page === 1}>Previous</button>
-            <button style={paginationButtonStyle} onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>Next</button>
-            <button style={paginationButtonStyle} onClick={() => handlePageChange(totalPages)} disabled={page === totalPages}>Last</button>
+            <Button variant="contained" disabled={page === 1} sx={paginationButtonSx} onClick={() => handlePageChange(1)}>First</Button>
+            <Button variant="contained" disabled={page === 1} sx={paginationButtonSx} onClick={() => handlePageChange(page - 1)}>Previous</Button>
+            <Button variant="contained" disabled={page === totalPages} sx={paginationButtonSx} onClick={() => handlePageChange(page + 1)}>Next</Button>
+            <Button variant="contained" disabled={page === totalPages} sx={paginationButtonSx} onClick={() => handlePageChange(totalPages)}>Last</Button>
             <span>Go to Page</span>
-            <select style={pageSelectStyle} value={page} onChange={e => handlePageChange(Number(e.target.value))}>
-              {Array.from({ length: totalPages }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
-            </select>
+            <MuiSelect
+              size="small"
+              value={page}
+              sx={{ minWidth: 36, fontSize: 14, height: 32, ml: 1 }}
+              onChange={e => handlePageChange(Number(e.target.value))}
+            >
+              {Array.from({ length: totalPages }, (_, i) => <MenuItem key={i + 1} value={i + 1}>{i + 1}</MenuItem>)}
+            </MuiSelect>
             <span>{totalPages} Pages Total</span>
           </div>
-        </div>
+        </>
       )}
-
-      {isModalOpen && (
-        <div style={modalOverlayStyle}>
-          <div style={modalStyle}>
-            <div style={modalHeaderStyle}>IP-&gt;PSTN CalleeID Manipulation</div>
-            <div style={modalBodyStyle}>
-              {IP_CALL_IN_CALLEEID_FIELDS.map((field) => (
-                <div key={field.name} style={modalRowStyle}>
-                  <label style={modalLabelStyle}>{field.label}</label>
-                  <div style={{flex: 1}}>
-                    {field.type === 'select' ? (
-                      <select name={field.name} value={formData[field.name] || ''} onChange={handleInputChange} style={modalInputStyle}>
-                        {field.options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-                      </select>
-                    ) : (
-                      <input type={field.type} name={field.name} value={formData[field.name] || ''} onChange={handleInputChange} style={modalInputStyle} />
-                    )}
-                  </div>
+      <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth={false} PaperProps={{ sx: { maxWidth: '95vw', width: 440, background: '#f8fafd', borderRadius: 2, border: '2px solid #222' } }}>
+        <DialogTitle className="bg-gradient-to-b from-gray-800 to-gray-600 text-white text-center font-semibold p-3 text-base">IP-&gt;PSTN CalleeID Manipulation</DialogTitle>
+        <DialogContent className="pt-3 pb-0 px-2" style={{padding: '12px 8px 0 8px'}}>
+          <div className="flex flex-col gap-2 w-full">
+            {IP_CALL_IN_CALLEEID_FIELDS.map((field) => (
+              <div key={field.name} className="flex items-center bg-gray-50 border border-gray-200 rounded px-2 py-1 gap-2" style={{ minHeight: 32 }}>
+                <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left" style={{width:180, marginRight:10}}>{field.label}</label>
+                <div className="flex-1">
+                  {field.type === 'select' ? (
+                    <FormControl size="small" fullWidth>
+                      <MuiSelect value={formData[field.name] || ''} onChange={e => handleInputChange({ target: { name: field.name, value: e.target.value } })} variant="outlined" sx={{ fontSize: 14 }}>
+                        {field.options.map(opt => (
+                          <MenuItem key={opt.value} value={opt.value} sx={{ fontSize: 14 }}>{opt.label}</MenuItem>
+                        ))}
+                      </MuiSelect>
+                    </FormControl>
+                  ) : (
+                    <TextField type={field.type || 'text'} name={field.name} value={formData[field.name] || ''} onChange={handleInputChange} size="small" fullWidth variant="outlined" inputProps={{ style: { fontSize: 14, padding: '3px 6px' } }} />
+                  )}
                 </div>
-              ))}
-            </div>
-            <div style={modalFooterStyle}>
-              <button onClick={handleSave} style={modalButtonStyle}>Save</button>
-              <button onClick={handleCloseModal} style={modalButtonGrayStyle}>Close</button>
-            </div>
+              </div>
+            ))}
           </div>
-        </div>
-      )}
+        </DialogContent>
+        <DialogActions className="p-6 pt-2 justify-center gap-6">
+          <Button variant="contained" sx={blueButtonSx} onClick={handleSave}>Save</Button>
+          <Button variant="contained" sx={blueButtonSx} onClick={handleCloseModal}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

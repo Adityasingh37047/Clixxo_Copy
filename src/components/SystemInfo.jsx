@@ -1,9 +1,12 @@
-import React from "react";
-import {
-  LAN_INTERFACES,
-  SYSTEM_INFO,
-  VERSION_INFO,
-} from "../constants/SystemInfoConstants";
+import React,{use, useEffect, useState}from "react";
+import {fetchSystemInfo} from "../api/apiService"
+// import {
+//   LAN_INTERFACES,
+//   SYSTEM_INFO,
+//   VERSION_INFO,
+// } from "../constants/SystemInfoConstants";
+
+
 
 const InfoRow = ({ label, values, isIndented = false }) => (
   <div
@@ -32,9 +35,52 @@ const LanSection = ({ name, data }) => (
 );
 
 const SystemInfo = () => {
+  const [LAN_INTERFACES,setLAN_INTERFACES]=useState([]);
+  const [SYSTEM_INFO,setSYSTEM_INFO]=useState([]);
+  const [VERSION_INFO, setVERSION_INFO ]=useState([]);
+  const [error,setErros]=useState("");
+const setSystemInfo= async()=>{
+  try {
+    
+  
+  const data = await fetchSystemInfo();
+  console.log(data);
+  if(data.success){
+    setLAN_INTERFACES(data.details.LAN_INTERFACES);
+    setSYSTEM_INFO(data.details.SYSTEM_INFO);
+    setVERSION_INFO(data.details.VERSION_INFO);
+    setErros("")
+  }
+else{
+  setErros(data.error)
+  setLAN_INTERFACES([]);
+  setSYSTEM_INFO([]);
+  setVERSION_INFO([]);
+}
+} catch (error) {
+  setErros(error.message)
+  setLAN_INTERFACES([]);
+  setSYSTEM_INFO([]);
+  setVERSION_INFO([]);
+}
+}
+  useEffect(()=>{
+    setSystemInfo();
+    // setInterval(()=>{
+    //   setSystemInfo();
+    // },5000)
+    
+  },[]);
   return (
     <div className="bg-white min-h-[calc(100vh-80px)] p-2 sm:p-4 md:p-8 flex flex-col items-center">
       <div className="w-full max-w-3xl">
+        {/* Error message with icon */}
+        {error && (
+          <div className="flex items-center mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            <span className="mr-2 text-xl">❌</span>
+            <span>{typeof error === 'string' ? error : JSON.stringify(error)}</span>
+          </div>
+        )}
         <div className="w-full h-9 bg-gradient-to-b from-[#d0ecff] via-[#7ecbfa] to-[#3b8fd6] rounded-t-lg flex items-center justify-center font-semibold text-lg text-gray-800 shadow mb-0">
           System Info
         </div>

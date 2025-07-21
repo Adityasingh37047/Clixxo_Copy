@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import {fetchTracerttest} from '../api/apiService';
+import axios from 'axios';
 import {
   TRACERT_TITLE,
   TRACERT_LABELS,
@@ -6,6 +8,7 @@ import {
   TRACERT_BUTTONS,
 } from '../constants/TRACERTTestConstants';
 import Button from '@mui/material/Button';
+
 
 const blueBar = (title) => (
   <div className="w-full bg-gradient-to-b from-[#b3e0ff] via-[#7ecbfa] to-[#3b8fd6] h-12 rounded-t-lg flex items-center justify-center text-[22px] font-semibold text-gray-800 shadow mb-0 border-b border-[#b3e0ff]">
@@ -34,6 +37,33 @@ const TRACERTTest = () => {
   const [destIp, setDestIp] = useState('');
   const [maxJumps, setMaxJumps] = useState('');
   const [info, setInfo] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleTracert = async()=> {
+    setError (false);
+    setInfo('');
+    try{
+      const Apiresponse = await axios.post("http://192.168.1.90:5000/api/tracert-test",
+      {
+        destIp,
+        maxJumps,
+        sourceIp,
+      });
+    console.log(Apiresponse)
+    if (Apiresponse.data.response){
+      setInfo(Apiresponse.data.responseData);
+    }else {
+      setInfo(Apiresponse.data.message);
+     }
+    } catch (err){
+      alert("Internal server error")
+      setError(true);
+
+    }
+    };
+
+
+
 
   return (
     <div className="w-full min-h-screen bg-white flex flex-col items-center py-6 px-2">
@@ -71,7 +101,7 @@ const TRACERTTest = () => {
           </form>
           {/* Buttons Row */}
           <div className="w-full flex flex-row justify-center gap-12 mb-8">
-            <Button variant="contained" sx={buttonSx}>{TRACERT_BUTTONS.start}</Button>
+            <Button variant="contained" sx={buttonSx} onClick={handleTracert}>{TRACERT_BUTTONS.start}</Button>
             <Button variant="contained" sx={buttonSx}>{TRACERT_BUTTONS.end}</Button>
           </div>
           {/* Info Section */}

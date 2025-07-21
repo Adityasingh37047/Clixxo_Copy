@@ -17,7 +17,7 @@ export const IP_CALL_IN_CALLERID_TABLE_COLUMNS = [
 
 // Form fields for the modal
 export const IP_CALL_IN_CALLERID_FIELDS = [
-  { name: 'index', label: 'Index:', type: 'select', options: Array.from({length: 1000}, (_, i) => ({ value: (i+1).toString(), label: (i+1).toString() })) },
+  { name: 'index', label: 'Index:', type: 'select', options: Array.from({length: 1}, (_, i) => ({ value: (i+1).toString(), label: (i+1).toString() })) },
   { name: 'callInitiator', label: 'Call Initiator:', type: 'select', options: [
     { value: 'sipTrunkGroup0', label: 'SIP Trunk Group [0]' },
     { value: 'sipTrunkGroup1', label: 'SIP Trunk Group [1]' },

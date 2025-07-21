@@ -2,9 +2,7 @@
 
 export const SIP_MEDIA_FIELDS = [
   { name: 'dtmfTransmitMode', label: 'DTMF Transmit Mode', type: 'select', options: [
-    { value: 'RFC2833', label: 'RFC2833' },
-    { value: 'SIP INFO', label: 'SIP INFO' },
-    { value: 'Inband', label: 'Inband' },
+    { value: 'RFC2833', label: 'RFC2833' }
   ]},
   { name: 'rfc2833Payload', label: 'RFC2833 Payload', type: 'text' },
   { name: 'rtpPortRange', label: 'RTP Port Range', type: 'text' },
@@ -43,27 +41,24 @@ export const SIP_MEDIA_CODEC_FIELD = {
   label: 'Gateway Negotiation Coding Sequence',
   type: 'select',
   options: [
-    { value: 'Default Priority', label: 'Default Priority' },
-    { value: 'G.711', label: 'G.711' },
-    { value: 'G.729', label: 'G.729' },
-    { value: 'G.723', label: 'G.723' },
-    { value: 'G.726', label: 'G.726' },
+    { value: 'Default Priority', label: 'Default Priority' }
+    
   ],
 };
 
 export const SIP_MEDIA_INITIAL_FORM = {
   dtmfTransmitMode: 'RFC2833',
-  rfc2833Payload: '101',
-  rtpPortRange: '6000,10000',
+  rfc2833Payload: '',
+  rtpPortRange: '',
   silenceSuppression: 'Disable',
   noiseReduction: 'Enable',
   comfortNoise: 'Enable',
   jitterMode: 'Static Mode',
-  jitterBuffer: '100',
-  jitterUnderrunLead: '100',
-  jitterOverrunLead: '50',
+  jitterBuffer: ' ',
+  jitterUnderrunLead: '',
+  jitterOverrunLead: '',
   ipOutputLevelControl: 'Manual',
-  voiceGainOutput: '0',
+  voiceGainOutput: '',
   packTimeDefault: 'Yes',
   codecSetting: 'Default Priority',
 };

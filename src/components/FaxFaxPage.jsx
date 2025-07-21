@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { FAX_MODE_OPTIONS, FAX_FORM_INITIAL } from '../constants/FaxFaxConstants';
+import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 
 const containerStyle = {
   background: '#fff',
@@ -109,57 +113,58 @@ const buttonGrayStyle = {
 };
 
 const FaxFaxPage = () => {
-  const [form, setForm] = useState(() => {
-    const saved = localStorage.getItem('fax_params');
-    return saved ? JSON.parse(saved) : FAX_FORM_INITIAL;
-  });
+  const [form, setForm] = useState({ ...FAX_FORM_INITIAL });
 
   const handleChange = (e) => {
     setForm({ ...form, faxMode: e.target.value });
   };
 
   const handleSave = () => {
-    localStorage.setItem('fax_params', JSON.stringify(form));
     alert('Fax parameters saved!');
   };
 
   const handleReset = () => {
-    setForm(FAX_FORM_INITIAL);
-    localStorage.setItem('fax_params', JSON.stringify(FAX_FORM_INITIAL));
+    setForm({ ...FAX_FORM_INITIAL });
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={panelStyle}>
-        <div style={blueBarStyle}>Fax Parameters</div>
-        <div style={formBoxStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 32, marginBottom: 32 }}>
-            <label style={{ fontWeight: 500, fontSize: 18, marginRight: 100 }}>Fax Mode</label>
-            <select
-              style={{ fontSize: 16, padding: '4px 16px', borderRadius: 6, border: '1.5px solid #b0b0b0', minWidth: 320, width: 320 }}
+    <div className="bg-white min-h-screen p-0 m-0 w-full">
+      <div className="w-full max-w-3xl mx-auto mt-10">
+        <div className="bg-gradient-to-b from-[#b3e0ff] to-[#3d92d0] text-[#222] font-semibold text-xl text-center rounded-t-lg border-b-2 border-gray-300 py-3">
+          Fax Parameters
+        </div>
+        <div className="border-2 border-gray-300 border-t-0 rounded-b-lg bg-white w-full flex flex-col items-center justify-center py-8 px-4">
+          <div className="w-full max-w-md flex flex-col sm:flex-row items-center justify-center gap-6">
+            <label className="font-medium text-base sm:text-lg text-gray-700 min-w-[120px] text-right sm:mr-8 mb-2 sm:mb-0">Fax Mode</label>
+            <Select
+              size="small"
               value={form.faxMode}
-              onChange={e => setForm({ ...form, faxMode: e.target.value })}
+              onChange={handleChange}
+              fullWidth
+              className="bg-white"
+              sx={{ minWidth: 180, maxWidth: 320 }}
             >
               {FAX_MODE_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                <MenuItem key={opt.value} value={opt.value}>{opt.label}</MenuItem>
               ))}
-            </select>
+            </Select>
           </div>
         </div>
-        {/* Buttons outside the black border */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 24, margin: '32px 0 24px 0' }}>
-          <button
-            style={{ background: 'linear-gradient(to bottom, #7cc0f1, #3d92d0)', color: '#fff', fontWeight: 600, border: 'none', borderRadius: 6, padding: '8px 36px', fontSize: 16, cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+        <div className="flex justify-center gap-8 mt-8">
+          <Button
+            variant="contained"
+            sx={{ background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600, fontSize: 16, borderRadius: 2, minWidth: 120, boxShadow: '0 2px 8px #b3e0ff', textTransform: 'none', '&:hover': { background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)', color: '#fff', }, }}
             onClick={handleSave}
           >
             Save
-          </button>
-          <button
-            style={{ background: 'linear-gradient(to bottom, #7cc0f1, #3d92d0)', color: '#fff', fontWeight: 600, border: 'none', borderRadius: 6, padding: '8px 36px', fontSize: 16, cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}
+          </Button>
+          <Button
+            variant="contained"
+            sx={{ background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600, fontSize: 16, borderRadius: 2, minWidth: 120, boxShadow: '0 2px 8px #b3e0ff', textTransform: 'none', '&:hover': { background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)', color: '#fff', }, }}
             onClick={handleReset}
           >
             Reset
-          </button>
+          </Button>
         </div>
       </div>
     </div>

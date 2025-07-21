@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import { ISDN_FORM_FIELDS, ISDN_FORM_INITIAL_VALUES } from '../constants/IsdnIsdnConstants';
+import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
 
 const sectionTitles = {
   global: 'ISDN Global Settings',
@@ -7,13 +12,8 @@ const sectionTitles = {
   network: 'ISDN Network Side',
 };
 
-const LOCAL_STORAGE_KEY = 'isdn_isdn_form';
-
 const IsdnIsdnPage = () => {
-  const [form, setForm] = useState(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : ISDN_FORM_INITIAL_VALUES;
-  });
+  const [form, setForm] = useState(ISDN_FORM_INITIAL_VALUES);
 
   const handleChange = (name, value, type) => {
     setForm(prev => ({
@@ -24,10 +24,8 @@ const IsdnIsdnPage = () => {
 
   const handleReset = () => {
     setForm(ISDN_FORM_INITIAL_VALUES);
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
   };
   const handleSave = () => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(form));
     alert('Settings saved!');
   };
 
@@ -37,248 +35,212 @@ const IsdnIsdnPage = () => {
   const userFields = ISDN_FORM_FIELDS.filter(f => f.section === 'user');
   const networkFields = ISDN_FORM_FIELDS.filter(f => f.section === 'network');
 
-  // Helper for disabled select
-  const disabledSelectStyle = {
-    minWidth: 120,
-    padding: 3,
-    borderRadius: 4,
-    border: '1px solid #888',
-    fontSize: 13,
-    background: '#eee',
-    color: '#888',
-    pointerEvents: 'none',
-  };
-
   return (
-    <div style={{
-      background: '#fff',
-      minHeight: 'calc(100vh - 128px)',
-      padding: '24px 0',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-      fontSize: 13,
-      overflowX: 'auto',
-    }}>
-      <div style={{
-        width: 1800,
-        border: '2px solid #222',
-        borderRadius: 8,
-        background: '#fff',
-        boxShadow: '0 2px 8px #0002',
-        padding: 0,
-        margin: '0 auto',
-        position: 'relative',
-      }}>
-        <div style={{
-          background: 'linear-gradient(to bottom, #7cc0f1, #3d92d0)',
-          color: '#222',
-          fontWeight: 600,
-          fontSize: 17,
-          textAlign: 'center',
-          borderTopLeftRadius: 8,
-          borderTopRightRadius: 8,
-          borderBottom: '2px solid #222',
-          padding: '6px 0',
-        }}>
+    <div className="bg-white min-h-[calc(100vh-128px)] flex flex-col items-center box-border py-6 px-2 sm:px-6">
+      <div className="w-full max-w-7xl mx-auto border-2 border-gray-300 rounded-lg bg-white shadow-lg p-0 relative overflow-x-auto">
+        <div className="bg-gradient-to-b from-[#b3e0ff] to-[#3d92d0] text-[#222] font-semibold text-lg text-center rounded-t-lg border-b-2 border-gray-300 py-2">
           ISDN Settings
         </div>
         {/* Top two rows as in screenshot */}
-        <div style={{ padding: '32px 32px 0 32px' }}>
+        <div className="px-2 sm:px-8 pt-8 w-full">
           {/* Row 1 */}
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+          <div className="flex flex-wrap gap-4 justify-between mb-2 w-full">
             {/* Link No. */}
-            <div style={{ minWidth: 120, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ color: '#666', fontWeight: 500 }}>Link No.</div>
-              <div style={{ color: '#666', fontSize: 13 }}>User Side: 0</div>
+            <div className="min-w-[120px] flex flex-col items-center">
+              <div className="text-gray-600 font-medium">Link No.</div>
+              <div className="text-gray-600 text-sm">User Side: 0</div>
             </div>
             {/* Logical PCM No. */}
-            <div style={{ minWidth: 120, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ color: '#666', fontWeight: 500 }}>Logical PCM No.</div>
-              <div style={{ color: '#666', fontSize: 13 }}>0</div>
+            <div className="min-w-[120px] flex flex-col items-center">
+              <div className="text-gray-600 font-medium">Logical PCM No.</div>
+              <div className="text-gray-600 text-sm">0</div>
             </div>
             {/* TEI */}
-            <div style={{ minWidth: 120, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>TEI</label>
-              <input
-                type="text"
+            <div className="min-w-[120px] flex flex-col items-center">
+              <label className="font-medium">TEI</label>
+              <TextField
+                size="small"
                 value={form.tei}
                 onChange={e => handleChange('tei', e.target.value, 'text')}
-                style={{ minWidth: 60, padding: 3, borderRadius: 4, border: '1px solid #888', fontSize: 13 }}
+                className="min-w-[60px]"
+                sx={{ mt: 0.5 }}
               />
             </div>
             {/* Ch Identification */}
-            <div style={{ minWidth: 160, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>Ch Identification</label>
-              <select
+            <div className="min-w-[160px] flex flex-col items-center">
+              <label className="font-medium">Ch Identification</label>
+              <Select
+                size="small"
                 value={form.chIdentification}
                 onChange={e => handleChange('chIdentification', e.target.value, 'select')}
-                style={{ minWidth: 100, padding: 3, borderRadius: 4, border: '1px solid #888', fontSize: 13 }}
+                className="min-w-[100px]"
               >
-                <option value="Number">Number</option>
-              </select>
+                <MenuItem value="Number">Number</MenuItem>
+              </Select>
             </div>
             {/* Default Callee Type */}
-            <div style={{ minWidth: 180, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>Default Callee Type</label>
-              <select
+            <div className="min-w-[180px] flex flex-col items-center">
+              <label className="font-medium">Default Callee Type</label>
+              <Select
+                size="small"
                 value={form.defaultCalleeType}
                 onChange={e => handleChange('defaultCalleeType', e.target.value, 'select')}
-                style={{ minWidth: 140, padding: 3, borderRadius: 4, border: '1px solid #888', fontSize: 13 }}
+                className="min-w-[140px]"
               >
-                <option value="National number (0XA1)">National number (0XA1)</option>
-              </select>
+                <MenuItem value="National number (0XA1)">National number (0XA1)</MenuItem>
+              </Select>
             </div>
             {/* Default Caller Type */}
-            <div style={{ minWidth: 180, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>Default Caller Type</label>
-              <select
+            <div className="min-w-[180px] flex flex-col items-center">
+              <label className="font-medium">Default Caller Type</label>
+              <Select
+                size="small"
                 value={form.defaultCallerType}
                 onChange={e => handleChange('defaultCallerType', e.target.value, 'select')}
-                style={{ minWidth: 140, padding: 3, borderRadius: 4, border: '1px solid #888', fontSize: 13 }}
+                className="min-w-[140px]"
               >
-                <option value="National number (0X21)">National number (0X21)</option>
-              </select>
+                <MenuItem value="National number (0X21)">National number (0X21)</MenuItem>
+              </Select>
             </div>
             {/* CODEC */}
-            <div style={{ minWidth: 120, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>CODEC</label>
-              <select
+            <div className="min-w-[120px] flex flex-col items-center">
+              <label className="font-medium">CODEC</label>
+              <Select
+                size="small"
                 value={form.codec}
                 onChange={e => handleChange('codec', e.target.value, 'select')}
-                style={{ minWidth: 80, padding: 3, borderRadius: 4, border: '1px solid #888', fontSize: 13 }}
+                className="min-w-[80px]"
               >
-                <option value="A-Law">A-Law</option>
-              </select>
+                <MenuItem value="A-Law">A-Law</MenuItem>
+              </Select>
             </div>
             {/* Auto Link Building */}
-            <div style={{ minWidth: 140, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>Auto Link Building</label>
-              <select
+            <div className="min-w-[140px] flex flex-col items-center">
+              <label className="font-medium">Auto Link Building</label>
+              <Select
+                size="small"
                 value={form.autoLinkBuilding}
                 onChange={e => handleChange('autoLinkBuilding', e.target.value, 'select')}
-                style={{ minWidth: 80, padding: 3, borderRadius: 4, border: '1px solid #888', fontSize: 13 }}
+                className="min-w-[80px]"
               >
-                <option value="Enable">Enable</option>
-                <option value="Disable">Disable</option>
-              </select>
+                <MenuItem value="Enable">Enable</MenuItem>
+                <MenuItem value="Disable">Disable</MenuItem>
+              </Select>
             </div>
             {/* CRC Check */}
-            <div style={{ minWidth: 100, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>CRC Check</label>
-              <input
-                type="checkbox"
+            <div className="min-w-[100px] flex flex-col items-center">
+              <label className="font-medium">CRC Check</label>
+              <Checkbox
                 checked={form.crcCheck}
                 onChange={() => handleChange('crcCheck', !form.crcCheck, 'checkbox')}
-                style={{ width: 15, height: 15 }}
+                sx={{ p: 0.5 }}
               />
             </div>
           </div>
           {/* Row 2 */}
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 18, marginTop: 8 }}>
+          <div className="flex flex-wrap gap-4 justify-between mb-4 mt-2 w-full">
             {/* Link No. */}
-            <div style={{ minWidth: 120, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ color: '#666', fontWeight: 500 }}>Link No.</div>
-              <div style={{ color: '#666', fontSize: 13 }}>User Side: 0</div>
+            <div className="min-w-[120px] flex flex-col items-center">
+              <div className="text-gray-600 font-medium">Link No.</div>
+              <div className="text-gray-600 text-sm">User Side: 0</div>
             </div>
             {/* Logical PCM No. */}
-            <div style={{ minWidth: 120, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ color: '#666', fontWeight: 500 }}>Logical PCM No.</div>
-              <div style={{ color: '#666', fontSize: 13 }}>0</div>
+            <div className="min-w-[120px] flex flex-col items-center">
+              <div className="text-gray-600 font-medium">Logical PCM No.</div>
+              <div className="text-gray-600 text-sm">0</div>
             </div>
             {/* Set Caller/Callee Type in case of Redirecting Num */}
-            <div style={{ minWidth: 260, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>Set Caller/Callee Type in case of Redirecting Num</label>
-              <input
-                type="checkbox"
+            <div className="min-w-[260px] flex flex-col items-center">
+              <label className="font-medium">Set Caller/Callee Type in case of Redirecting Num</label>
+              <Checkbox
                 checked={form.setCallerCalleeTypeRedirectingNum || false}
                 onChange={() => handleChange('setCallerCalleeTypeRedirectingNum', !form.setCallerCalleeTypeRedirectingNum, 'checkbox')}
-                style={{ width: 15, height: 15 }}
+                sx={{ p: 0.5 }}
               />
             </div>
             {/* Callee Type (with Redirecting Num) */}
-            <div style={{ minWidth: 200, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>Callee Type (with Redirecting Num)</label>
-              <select
+            <div className="min-w-[200px] flex flex-col items-center">
+              <label className="font-medium">Callee Type (with Redirecting Num)</label>
+              <Select
+                size="small"
                 value={form.calleeTypeWithRedirectingNum || 'National number'}
                 onChange={e => handleChange('calleeTypeWithRedirectingNum', e.target.value, 'select')}
+                className="min-w-[140px]"
                 disabled={!form.setCallerCalleeTypeRedirectingNum}
-                style={{ minWidth: 140, padding: 3, borderRadius: 4, border: '1px solid #888', fontSize: 13, background: !form.setCallerCalleeTypeRedirectingNum ? '#eee' : '#fff', color: !form.setCallerCalleeTypeRedirectingNum ? '#888' : '#222' }}
               >
-                <option value="National number">National number</option>
-                <option value="International number">International number</option>
-              </select>
+                <MenuItem value="National number">National number</MenuItem>
+                <MenuItem value="International number">International number</MenuItem>
+              </Select>
             </div>
             {/* Caller Type (with Redirecting Num) */}
-            <div style={{ minWidth: 200, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>Caller Type (with Redirecting Num)</label>
-              <select
+            <div className="min-w-[200px] flex flex-col items-center">
+              <label className="font-medium">Caller Type (with Redirecting Num)</label>
+              <Select
+                size="small"
                 value={form.callerTypeWithRedirectingNum || 'National number'}
                 onChange={e => handleChange('callerTypeWithRedirectingNum', e.target.value, 'select')}
+                className="min-w-[140px]"
                 disabled={!form.setCallerCalleeTypeRedirectingNum}
-                style={{ minWidth: 140, padding: 3, borderRadius: 4, border: '1px solid #888', fontSize: 13, background: !form.setCallerCalleeTypeRedirectingNum ? '#eee' : '#fff', color: !form.setCallerCalleeTypeRedirectingNum ? '#888' : '#222' }}
               >
-                <option value="National number">National number</option>
-                <option value="International number">International number</option>
-              </select>
+                <MenuItem value="National number">National number</MenuItem>
+                <MenuItem value="International number">International number</MenuItem>
+              </Select>
             </div>
             {/* Synchronize Modification */}
-            <div style={{ minWidth: 180, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label style={{ fontWeight: 500 }}>Synchronize Modification</label>
-              <input
-                type="checkbox"
+            <div className="min-w-[180px] flex flex-col items-center">
+              <label className="font-medium">Synchronize Modification</label>
+              <Checkbox
                 checked={form.synchronizeModification}
                 onChange={() => handleChange('synchronizeModification', !form.synchronizeModification, 'checkbox')}
-                style={{ width: 15, height: 15 }}
+                sx={{ p: 0.5 }}
               />
             </div>
           </div>
         </div>
 
         {/* ISDN Global Settings */}
-        <div style={{ margin: '32px 0 6px 0', fontWeight: 600, fontSize: 15, marginLeft: 265 }}>{sectionTitles.global}</div>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: 64, marginLeft: 420, width: 900 }}>
+        <div className="mt-8 mb-2 font-semibold text-base px-2 sm:px-4">{sectionTitles.global}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 w-full max-w-full px-2 sm:px-4">
           {/* Left column: labels and checkboxes */}
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <div className="flex flex-col flex-1 w-full">
             {globalFields.map(field => (
-              <div key={field.name} style={{ display: 'flex', alignItems: 'center', minHeight: 38, marginBottom: 6 }}>
+              <div key={field.name} className="flex items-center min-h-[38px] mb-1 w-full">
                 {field.type === 'checkbox' ? (
                   <>
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={form[field.name]}
                       onChange={() => handleChange(field.name, !form[field.name], field.type)}
-                      style={{ width: 16, height: 16, marginRight: 10 }}
+                      sx={{ p: 0.5 }}
                     />
-                    <span style={{ fontWeight: 400 }}>{field.label}</span>
+                    <span className="font-normal break-words whitespace-normal w-full">{field.label}</span>
                   </>
                 ) : (
-                  <span style={{ fontWeight: 400 }}>{field.label}</span>
+                  <span className="font-normal break-words whitespace-normal w-full">{field.label}</span>
                 )}
               </div>
             ))}
           </div>
           {/* Right column: input/select fields, empty for checkboxes */}
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, marginLeft: 60 }}>
+          <div className="flex flex-col flex-1 ml-0 sm:ml-4 w-full">
             {globalFields.map(field => (
-              <div key={field.name} style={{ minHeight: 38, marginBottom: 6, display: 'flex', alignItems: 'center' }}>
+              <div key={field.name} className="min-h-[38px] mb-1 flex items-center w-full">
                 {field.type === 'select' ? (
-                  <select
+                  <Select
+                    size="small"
                     value={form[field.name]}
                     onChange={e => handleChange(field.name, e.target.value, field.type)}
-                    style={{ width: 320, padding: 4, borderRadius: 4, border: '1px solid #888', fontSize: 15 }}
+                    className="w-full max-w-xs"
                   >
                     {field.options.map(opt => (
-                      <option key={opt} value={opt}>{opt}</option>
+                      <MenuItem key={opt} value={opt}>{opt}</MenuItem>
                     ))}
-                  </select>
+                  </Select>
                 ) : field.type === 'text' ? (
-                  <input
-                    type="text"
+                  <TextField
+                    size="small"
                     value={form[field.name]}
                     onChange={e => handleChange(field.name, e.target.value, field.type)}
-                    style={{ width: 320, padding: 4, borderRadius: 4, border: '1px solid #888', fontSize: 15 }}
+                    className="w-full max-w-xs"
                   />
                 ) : null}
               </div>
@@ -287,183 +249,164 @@ const IsdnIsdnPage = () => {
         </div>
 
         {/* ISDN User Side */}
-        <div style={{ margin: '32px 0 6px 0', fontWeight: 600, fontSize: 15, marginLeft: 300 }}>{sectionTitles.user}</div>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: 60, marginLeft: 420, marginBottom: 32, alignItems: 'flex-start' }}>
+        <div className="mt-8 mb-2 font-semibold text-base px-2 sm:px-4">{sectionTitles.user}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-4 mb-8 items-start w-full max-w-full px-2 sm:px-4">
           {/* Column 1: Two checkboxes stacked vertically */}
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', minWidth: 340, gap: 8 }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <input
-                type="checkbox"
+          <div className="flex flex-col min-w-0 gap-2 w-full">
+            <div className="flex items-center">
+              <Checkbox
                 checked={form.userSendCalledPartyNumberComplete}
                 onChange={() => handleChange('userSendCalledPartyNumberComplete', !form.userSendCalledPartyNumberComplete, 'checkbox')}
-                style={{ width: 16, height: 16, marginRight: 10 }}
+                sx={{ p: 0.5 }}
               />
-              <span style={{ fontWeight: 400 }}>
-                Send the 'Called Party Number Complete' Parameter
-              </span>
+              <span className="font-normal break-words whitespace-normal w-full">Send the 'Called Party Number Complete' Parameter</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <input
-                type="checkbox"
+            <div className="flex items-center">
+              <Checkbox
                 checked={form.userSendChannelIdentification}
                 onChange={() => handleChange('userSendChannelIdentification', !form.userSendChannelIdentification, 'checkbox')}
-                style={{ width: 16, height: 16, marginRight: 10 }}
+                sx={{ p: 0.5 }}
               />
-              <span style={{ fontWeight: 400 }}>
-                Send Channel Identification Message
-              </span>
+              <span className="font-normal break-words whitespace-normal w-full">Send Channel Identification Message</span>
             </div>
           </div>
           {/* Column 2: Wait Confirm Time (T310) (s) and Set Cause Value Length to 2 bytes */}
-          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 340, gap: 2 }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ fontWeight: 400, marginRight: 8 }}>Wait Confirm Time (T310) (s)</span>
-              <input
-                type="text"
+          <div className="flex flex-col min-w-0 gap-2 w-full">
+            <div className="flex items-center">
+              <span className="font-normal mr-2 break-words whitespace-normal w-full">Wait Confirm Time (T310) (s)</span>
+              <TextField
+                size="small"
                 value={form.userWaitConfirmTime}
                 onChange={e => handleChange('userWaitConfirmTime', e.target.value, 'text')}
-                style={{ width: 70, padding: 4, borderRadius: 4, border: '1px solid #888', fontSize: 15, marginLeft: 4 }}
+                className="w-[70px] max-w-xs ml-1"
               />
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', marginTop: 0 }}>
-              <input
-                type="checkbox"
+            <div className="flex items-center mt-0">
+              <Checkbox
                 checked={form.userSetCauseValueLength}
                 onChange={() => handleChange('userSetCauseValueLength', !form.userSetCauseValueLength, 'checkbox')}
-                style={{ width: 16, height: 16, marginRight: 10 }}
+                sx={{ p: 0.5 }}
               />
-              <span style={{ fontWeight: 400 }}>Set Cause Value Length to 2 bytes</span>
+              <span className="font-normal break-words whitespace-normal w-full">Set Cause Value Length to 2 bytes</span>
             </div>
           </div>
           {/* Column 3: Allow the Preferential Channel Selection, vertically centered */}
-          <div style={{ display: 'flex', alignItems: 'center', minWidth: 340, height: 76 }}>
-            <input
-              type="checkbox"
+          <div className="flex items-center min-w-0 h-[76px] w-full">
+            <Checkbox
               checked={form.userAllowPreferentialChannel}
               onChange={() => handleChange('userAllowPreferentialChannel', !form.userAllowPreferentialChannel, 'checkbox')}
-              style={{ width: 16, height: 16, marginRight: 10 }}
+              sx={{ p: 0.5 }}
             />
-            <span style={{ fontWeight: 400 }}>Allow the Preferential Channel Selection</span>
+            <span className="font-normal break-words whitespace-normal w-full">Allow the Preferential Channel Selection</span>
           </div>
         </div>
 
         {/* ISDN Network Side */}
-        <div style={{ margin: '32px 0 6px 0', fontWeight: 600, fontSize: 15, marginLeft: 280 }}>{sectionTitles.network}</div>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '340px 340px 340px',
-            gridTemplateRows: '38px 38px',
-            gap: '0 60px',
-            marginLeft: 420,
-            marginBottom: 16,
-            alignItems: 'center'
-          }}
-        >
+        <div className="mt-8 mb-2 font-semibold text-base px-2 sm:px-4">{sectionTitles.network}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-4 mb-4 items-center w-full max-w-full px-2 sm:px-4">
           {/* Row 1 */}
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <input
-              type="checkbox"
+          <div className="flex items-center min-w-0 w-full">
+            <Checkbox
               checked={form.networkSendCalledPartyNumberComplete}
               onChange={() => handleChange('networkSendCalledPartyNumberComplete', !form.networkSendCalledPartyNumberComplete, 'checkbox')}
-              style={{ width: 16, height: 16, marginRight: 10 }}
+              sx={{ p: 0.5 }}
             />
-            <span>Send the 'Called Party Number Complete' Parameter</span>
+            <span className="break-words whitespace-normal w-full">Send the 'Called Party Number Complete' Parameter</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <span style={{ marginRight: 8 }}>Wait Confirm Time (T310) (s)</span>
-            <input
-              type="text"
+          <div className="flex items-center min-w-0 w-full">
+            <span className="mr-2 break-words whitespace-normal w-full">Wait Confirm Time (T310) (s)</span>
+            <TextField
+              size="small"
               value={form.networkWaitConfirmTime}
               onChange={e => handleChange('networkWaitConfirmTime', e.target.value, 'text')}
-              style={{ width: 70, padding: 4, borderRadius: 4, border: '1px solid #888', fontSize: 15, marginLeft: 4 }}
+              className="w-[70px] max-w-xs ml-1"
             />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minHeight: 76 }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <input
-                type="checkbox"
+          <div className="flex flex-col items-start min-h-[76px] min-w-0 w-full">
+            <div className="flex items-center">
+              <Checkbox
                 checked={form.networkAllowPreferentialChannel}
                 onChange={() => handleChange('networkAllowPreferentialChannel', !form.networkAllowPreferentialChannel, 'checkbox')}
-                style={{ width: 16, height: 16, marginRight: 10 }}
+                sx={{ p: 0.5 }}
               />
-              <span>Allow the Preferential Channel Selection</span>
+              <span className="break-words whitespace-normal w-full">Allow the Preferential Channel Selection</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', marginTop: 18 }}>
-              <input
-                type="checkbox"
+            <div className="flex items-center mt-3">
+              <Checkbox
                 checked={form.networkEnable || false}
                 onChange={() => handleChange('networkEnable', !form.networkEnable, 'checkbox')}
-                style={{ width: 16, height: 16, marginRight: 10 }}
+                sx={{ p: 0.5 }}
               />
-              <span>Enable</span>
+              <span className="break-words whitespace-normal w-full">Enable</span>
             </div>
           </div>
           {/* Row 2 */}
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <input
-              type="checkbox"
+          <div className="flex items-center min-w-0 w-full">
+            <Checkbox
               checked={form.networkSendChannelIdentification}
               onChange={() => handleChange('networkSendChannelIdentification', !form.networkSendChannelIdentification, 'checkbox')}
-              style={{ width: 16, height: 16, marginRight: 10 }}
+              sx={{ p: 0.5 }}
             />
-            <span>Send Channel Identification Message</span>
+            <span className="break-words whitespace-normal w-full">Send Channel Identification Message</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <input
-              type="checkbox"
+          <div className="flex items-center min-w-0 w-full">
+            <Checkbox
               checked={form.networkSetCauseValueLength}
               onChange={() => handleChange('networkSetCauseValueLength', !form.networkSetCauseValueLength, 'checkbox')}
-              style={{ width: 16, height: 16, marginRight: 10 }}
+              sx={{ p: 0.5 }}
             />
-            <span>Set Cause Value Length to 2 bytes</span>
+            <span className="break-words whitespace-normal w-full">Set Cause Value Length to 2 bytes</span>
           </div>
           <div /> {/* Empty cell */}
         </div>
 
         {/* Send ISDN Redirecting Number text */}
-        <div style={{ marginLeft: 420, marginBottom: 16, fontWeight: 500, color: '#444', fontSize: 13 }}>
-          Send ISDN Redirecting Number
-        </div>
+        <div className="px-2 sm:px-4 mb-4 font-medium text-gray-700 text-sm">Send ISDN Redirecting Number</div>
       </div>
       {/* Save and Reset buttons outside the border */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 32, marginBottom: 12 }}>
-        <button
-          type="button"
-          onClick={handleSave}
-          style={{
+      <div className="flex justify-center gap-6 mt-8 mb-3">
+        <Button
+          variant="contained"
+          sx={{
             background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
             color: '#fff',
             fontWeight: 600,
-            fontSize: 15,
-            border: '1.2px solid #1976d2',
-            borderRadius: 6,
-            padding: '6px 32px',
-            boxShadow: '0 2px 6px #0002',
-            cursor: 'pointer',
+            fontSize: '15px',
+            borderRadius: 1.5,
+            minWidth: 120,
+            boxShadow: '0 2px 8px #b3e0ff',
+            textTransform: 'none',
+            '&:hover': {
+              background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+              color: '#fff',
+            },
           }}
+          onClick={handleSave}
         >
           Save
-        </button>
-        <button
-          type="button"
-          onClick={handleReset}
-          style={{
+        </Button>
+        <Button
+          variant="contained"
+          sx={{
             background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
             color: '#fff',
             fontWeight: 600,
-            fontSize: 15,
-            border: '1.2px solid #1976d2',
-            borderRadius: 6,
-            padding: '6px 32px',
-            boxShadow: '0 2px 6px #0002',
-            cursor: 'pointer',
+            fontSize: '15px',
+            borderRadius: 1.5,
+            minWidth: 120,
+            boxShadow: '0 2px 8px #b3e0ff',
+            textTransform: 'none',
+            '&:hover': {
+              background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+              color: '#fff',
+            },
           }}
+          onClick={handleReset}
         >
           Reset
-        </button>
+        </Button>
       </div>
-      <div style={{ color: 'red', textAlign: 'center', fontSize: 13, marginBottom: 10, marginTop: -10 }}>
+      <div className="text-red-600 text-center text-sm mb-2 mt-[-10px]">
         Note 1: You shall restart the service to validate the settings on this page!
       </div>
     </div>

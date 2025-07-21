@@ -1,135 +1,46 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { IP_ROUTING_TABLE_COLUMNS, IP_ROUTING_TABLE_MODAL_FIELDS, IP_ROUTING_TABLE_INITIAL_ROW } from '../constants/IPRoutingTableConstants';
 import EditDocumentIcon from '@mui/icons-material/EditDocument';
-import { Button } from '@mui/material';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Select, MenuItem } from '@mui/material';
 
-const tableContainerStyle = {
-  background: '#fff',
-  borderRadius: 8,
-  boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-  width: '100%',
-  minHeight: 400,
-  display: 'flex',
-  flexDirection: 'column',
-  overflow: 'hidden',
-  paddingTop:'20px',
-};
-const contentAreaStyle = {
-  border: '2px solid #444',
-  borderTop: 'none',
-  borderTopLeftRadius: 0,
-  borderTopRightRadius: 0,
-  borderBottomLeftRadius: 8,
-  borderBottomRightRadius: 8,
-  background: '#fff',
-  width: '100%',
-  position: 'relative',
-  marginTop: 0,
-  paddingTop: 0,
-};
-const blueBarStyle = {
-  width: '100%',
-  height: 32,
-  background: 'linear-gradient(to bottom, #b3e0ff 0%, #6ec1f7 50%, #3b8fd6 100%)',
-  borderTopLeftRadius: 8,
-  borderTopRightRadius: 8,
-  borderBottomLeftRadius: 0,
-  borderBottomRightRadius: 0,
-  display: 'flex',
-  alignItems: 'center',
-  fontWeight: 400,
-  fontSize: 17,
-  color: '#111',
-  justifyContent: 'center',
-  boxShadow: '0 2px 8px 0 rgba(80,160,255,0.10)',
-  borderBottom: 'none',
-  
-};
-const thStyle = {
-  background: '#fff', color: '#222', fontWeight: 600, fontSize: 15, border: '1px solid #bbb', padding: '6px 8px', whiteSpace: 'nowrap', textAlign: 'center',
-};
-const tdStyle = {
-  border: '1px solid #bbb', padding: '6px 8px', fontSize: 14, background: '#fff', textAlign: 'center', whiteSpace: 'nowrap', height: 40,
-};
-const emptyRowStyle = {
-  ...tdStyle,
-  borderBottom: '1px solid #bbb',
-  background: '#fff',
-  height: 40,
-};
-const buttonStyle = {
-  background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600, fontSize: 16, border: 'none', borderRadius: 6, padding: '7px 32px', minWidth: 100, boxShadow: '0 2px 6px #0002', cursor: 'pointer', margin: '0 8px',
-};
-const grayButtonStyle = {
-  ...buttonStyle, background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)', color: '#222',
-};
-const legacyModalOverlay = {
-  position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.18)', zIndex: 1000,
-  display: 'flex', alignItems: 'center', justifyContent: 'center',
-};
-const legacyModalBox = {
-  background: '#f4f6fa',
-  borderRadius: 6,
-  boxShadow: '0 4px 24px #0005',
-  minWidth: 340,
-  maxWidth: '90vw',
-  padding: '0 24px 18px 24px',
-  border: '2px solid #222',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'stretch',
-};
-const legacyModalHeader = {
-  background: 'linear-gradient(to bottom, #3b4a56 0%, #222 100%)',
-  color: '#fff',
-  fontWeight: 500,
-  fontSize: 16,
-  padding: '10px 0 8px 0',
-  borderTopLeftRadius: 4,
-  borderTopRightRadius: 4,
-  textAlign: 'center',
-  margin: '-2px -24px 18px -24px',
-  letterSpacing: 0.2,
-};
-const legacyModalLabel = { fontWeight: 500, marginBottom: 2, fontSize: 14 };
-const legacyModalInput = { width: '100%', fontSize: 14, padding: '4px 8px', borderRadius: 3, border: '1px solid #bbb', background: '#fafdff', marginBottom: 10, height: 28 };
-const legacyModalButtonBar = { display: 'flex', justifyContent: 'center', gap: 18, marginTop: 8 };
-const legacySaveButton = { background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600, fontSize: 15, border: '1px solid #1976d2', borderRadius: 4, padding: '6px 32px', minWidth: 90, boxShadow: '0 2px 6px #0002', cursor: 'pointer' };
-const legacyCloseButton = { background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)', color: '#222', fontWeight: 600, fontSize: 15, border: '1px solid #bbb', borderRadius: 4, padding: '6px 32px', minWidth: 90, boxShadow: '0 2px 6px #0002', cursor: 'pointer' };
-
-const MIN_ROWS = 10;
-
-const buttonSx = {
+const blueButtonSx = {
   background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)',
   color: '#fff',
-  fontSize: 18,
-  px: 6,
-  py: 1.5,
-  borderRadius: 2,
+  fontWeight: 600,
+  fontSize: 16,
+  borderRadius: 1.5,
   minWidth: 120,
-  boxShadow: '0 2px 8px #b3e0ff',
-  fontWeight: 500,
-  mr: 2,
+  boxShadow: '0 2px 6px #0002',
+  textTransform: 'none',
+  px: 3,
+  py: 1.5,
+  padding: '6px 28px',
+  border: '1px solid #0e8fd6',
   '&:hover': {
     background: 'linear-gradient(to bottom, #0e8fd6 0%, #3bb6f5 100%)',
+    color: '#fff',
   },
 };
-
 const grayButtonSx = {
   background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)',
   color: '#222',
-  fontSize: 18,
-  px: 6,
-  py: 1.5,
-  borderRadius: 2,
+  fontWeight: 600,
+  fontSize: 16,
+  borderRadius: 1.5,
   minWidth: 120,
-  boxShadow: '0 2px 8px #b3e0ff',
-  fontWeight: 500,
-  mr: 2,
+  boxShadow: '0 2px 6px #0002',
+  textTransform: 'none',
+  px: 3,
+  py: 1.5,
+  padding: '6px 28px',
+  border: '1px solid #bfc6d1',
   '&:hover': {
     background: 'linear-gradient(to bottom, #bfc6d1 0%, #e3e7ef 100%)',
+    color: '#222',
   },
 };
+
+const MIN_ROWS = 10;
 
 const IPRoutingTable = () => {
   const [rows, setRows] = useState([]);
@@ -179,7 +90,8 @@ const IPRoutingTable = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = (e) => {
+    e && e.preventDefault && e.preventDefault();
     if (editIndex !== null) {
       const updatedRows = [...rows];
       updatedRows[editIndex] = { ...form };
@@ -215,92 +127,102 @@ const IPRoutingTable = () => {
 
   return (
     <div className="w-full max-w-[1400px] mx-auto p-2 md:p-6 flex flex-col items-center min-h-[calc(100vh-80px)]">
-      <div style={tableContainerStyle}>
-        <div style={blueBarStyle}>IP Routing Table</div>
-        <div style={contentAreaStyle} className="overflow-x-auto">
-          <div style={{ width: '100%', overflowX: 'auto' }}>
-            <table className="min-w-full" style={{ borderCollapse: 'collapse', width: '100%' }}>
-              <thead>
-                <tr>
-                  {IP_ROUTING_TABLE_COLUMNS.map((col) => (
-                    <th key={col.key} style={{ ...thStyle, minWidth: col.width }}>{col.label}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody ref={tableScrollRef} onScroll={handleTableScroll} style={{ maxHeight: 400, overflowY: 'auto' }}>
-                {displayRows.map((row, idx) =>
-                  row ? (
-                    <tr key={idx}>
-                      <td style={tdStyle}>
-                        <input type="checkbox" checked={row.checked || false} onChange={() => handleCheck(idx)} />
-                      </td>
-                      <td style={tdStyle}>{row.no}</td>
-                      <td style={tdStyle}>{row.destination}</td>
-                      <td style={tdStyle}>{row.gateway}</td>
-                      <td style={tdStyle}>{row.subnetMask}</td>
-                      <td style={tdStyle}>{row.networkPort}</td>
-                      <td style={tdStyle}>
-                        <EditDocumentIcon style={{ color: '#1976d2', fontSize: 22, cursor: 'pointer' }} onClick={() => openModal(idx)} />
-                      </td>
-                    </tr>
-                  ) : (
-                    <tr key={idx}>
-                      {IP_ROUTING_TABLE_COLUMNS.map((col) => (
-                        <td key={col.key} style={emptyRowStyle}></td>
-                      ))}
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </table>
-          </div>
+      <div className="w-full bg-white rounded-xl shadow border-2 border-gray-400 flex flex-col overflow-hidden">
+        <div className="w-full bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] h-10 flex items-center justify-center font-semibold text-lg text-black shadow mb-0 border-b-2 border-gray-400">
+          IP Routing Table
         </div>
-        <div className="flex flex-col md:flex-row justify-between items-center w-full px-4 py-2 gap-4 bg-[#f4f6fa] border-t border-gray-300">
-          <div className="flex gap-2">
-            <Button variant="contained" sx={grayButtonSx} onClick={handleDelete}>Delete</Button>
-            <Button variant="contained" sx={grayButtonSx} onClick={handleClearAll}>ClearAll</Button>
-          </div>
-          <Button variant="contained" sx={buttonSx} onClick={() => openModal(null)}>Add New</Button>
+        <div className="overflow-x-auto">
+          <table className="min-w-full border-collapse w-full">
+            <thead>
+              <tr>
+                {IP_ROUTING_TABLE_COLUMNS.map((col) => (
+                  <th key={col.key} className="bg-white text-gray-800 font-semibold text-[15px] border border-gray-300 px-2 py-2 whitespace-nowrap text-center" style={{ minWidth: col.width }}>{col.label}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody ref={tableScrollRef} onScroll={handleTableScroll}>
+              {displayRows.map((row, idx) =>
+                row ? (
+                  <tr key={idx}>
+                    <td className="border border-gray-300 px-2 py-2 text-center">
+                      <input type="checkbox" checked={row.checked || false} onChange={() => handleCheck(idx)} />
+                    </td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">{row.no}</td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">{row.destination}</td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">{row.gateway}</td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">{row.subnetMask}</td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">{row.networkPort}</td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">
+                      <EditDocumentIcon style={{ color: '#1976d2', fontSize: 22, cursor: 'pointer' }} onClick={() => openModal(idx)} />
+                    </td>
+                  </tr>
+                ) : (
+                  <tr key={idx}>
+                    {IP_ROUTING_TABLE_COLUMNS.map((col) => (
+                      <td key={col.key} className="border border-gray-300 px-2 py-2 text-center h-10"></td>
+                    ))}
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
+      {/* Button Row OUTSIDE the bordered box */}
+      <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-[1400px] px-4 py-4 gap-4 bg-[#f4f6fa] mt-2">
+        <div className="flex gap-2">
+          <Button variant="contained" sx={grayButtonSx} onClick={handleDelete}>Delete</Button>
+          <Button variant="contained" sx={grayButtonSx} onClick={handleClearAll}>Clear All</Button>
+        </div>
+        <Button variant="contained" sx={blueButtonSx} onClick={() => openModal(null)}>Add New</Button>
+      </div>
       {/* Modal */}
-      {modalOpen && (
-        <div style={legacyModalOverlay}>
-          <div style={legacyModalBox}>
-            <div style={legacyModalHeader}>Routing Table</div>
+      <Dialog open={modalOpen} onClose={closeModal} maxWidth={false} PaperProps={{ sx: { maxWidth: '95vw', width: 400, background: '#f4f6fa', borderRadius: 2, border: '1.5px solid #888' } }}>
+        <DialogTitle className="bg-gradient-to-b from-gray-800 to-gray-600 text-white text-center font-semibold p-3 text-base rounded-t-md">
+          Routing Table
+        </DialogTitle>
+        <DialogContent className="pt-3 pb-0 px-2" style={{padding: '24px 24px 0 24px'}}>
+          <div className="flex flex-col gap-0 w-full">
             {IP_ROUTING_TABLE_MODAL_FIELDS.map((field) => (
-              <div key={field.key} style={{ marginBottom: 8 }}>
-                <label style={legacyModalLabel}>{field.label}:</label>
+              <div key={field.key} className="flex flex-row items-center gap-2 mb-4 w-full">
+                <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-40 flex-shrink-0">{field.label}:</label>
                 {field.type === 'text' || field.type === 'number' ? (
-                  <input
-                    type={field.type}
+                  <TextField
                     name={field.key}
+                    type={field.type}
                     value={form[field.key]}
                     onChange={handleFormChange}
-                    style={legacyModalInput}
+                    size="small"
+                    fullWidth
+                    variant="outlined"
+                    inputProps={{ style: { fontSize: 14, padding: '3px 6px' } }}
+                    sx={{ minWidth: 0 }}
                   />
                 ) : null}
                 {field.type === 'select' ? (
-                  <select
+                  <Select
                     name={field.key}
                     value={form[field.key]}
                     onChange={handleFormChange}
-                    style={legacyModalInput}
+                    size="small"
+                    fullWidth
+                    variant="outlined"
+                    sx={{ fontSize: 14, minWidth: 0 }}
                   >
                     {field.options.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      <MenuItem key={opt.value} value={opt.value} sx={{ fontSize: 14 }}>{opt.label}</MenuItem>
                     ))}
-                  </select>
+                  </Select>
                 ) : null}
               </div>
             ))}
-            <div style={legacyModalButtonBar}>
-              <button style={legacySaveButton} onClick={handleSave}>Save</button>
-              <button style={legacyCloseButton} onClick={closeModal}>Close</button>
-            </div>
           </div>
-        </div>
-      )}
+        </DialogContent>
+        <DialogActions className="flex justify-center gap-8 pb-6">
+          <Button variant="contained" sx={blueButtonSx} onClick={handleSave}>Save</Button>
+          <Button variant="contained" sx={grayButtonSx} onClick={closeModal}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
