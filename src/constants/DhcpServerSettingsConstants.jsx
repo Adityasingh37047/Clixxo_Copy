@@ -23,13 +23,13 @@ export const DHCP_SERVER_SETTINGS_FIELDS = [
 
 export const DHCP_SERVER_SETTINGS_INITIAL_FORM = {
   enabled1: false,
-  ipRange1: '192.168.1.234-238',
-  subnetMask1: '255.255.255.0',
-  defaultGateway1: '192.168.1.254',
-  dnsServer1: '0.0.0.0',
+  ipRange1: '',
+  subnetMask1: '',
+  defaultGateway1: '',
+  dnsServer1: '',
   enabled2: false,
-  ipRange2: '192.168.1.234-238',
-  subnetMask2: '255.255.255.0',
-  defaultGateway2: '192.168.1.254',
-  dnsServer2: '0.0.0.0',
+  ipRange2: '',
+  subnetMask2: '',
+  defaultGateway2: '',
+  dnsServer2: '',
 };

@@ -8,7 +8,7 @@ export const DDOS_FIELDS = [
   { key: 'telnetLimit', label: 'TELNET Limit', type: 'number' },
   { key: 'blacklistValidityType', label: 'Set Validity of Attacker IP Blacklist', type: 'select', options: [
     { value: 'inSetTime', label: 'In The Set Time' },
-    { value: 'forever', label: 'Forever' },
+    
   ] },
   { key: 'blacklistTime', label: 'Time (Min)', type: 'number' },
 ];

@@ -5,7 +5,7 @@ export const PING_TITLE = 'Ping Test';
 export const PING_LABELS = {
   sourceIp: 'Source IP Address',
   destIp: 'Destination Address',
-  count: 'Ping Count (0-100)',
+  count: 'Ping Count (1-100)',
   length: 'Package Length (56-1024 bytes)',
   info: 'Info',
 };
@@ -19,4 +19,5 @@ export const PING_SOURCE_OPTIONS = [
 export const PING_BUTTONS = {
   start: 'Start',
   end: 'End',
+  loading: 'Loading...',
 };

@@ -11,7 +11,7 @@ export const TRACERT_LABELS = {
 
 // Dropdown options
 export const TRACERT_SOURCE_OPTIONS = [
-  { value: 'lan1', label: 'LAN 1:192.168.1.101' },
+  { value: ' ', },
 ];
 
 // Button labels

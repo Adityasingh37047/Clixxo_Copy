@@ -19,6 +19,58 @@ const initialForm = {
   description: 'default',
 };
 
+// Custom scrollbar styles
+const customScrollbarRowStyle = {
+  width: '100%', 
+  margin: '0 auto', 
+  background: '#f4f6fa', 
+  display: 'flex', 
+  alignItems: 'center', 
+  height: 24, 
+  borderBottomLeftRadius: 8, 
+  borderBottomRightRadius: 8, 
+  borderTop: '1px solid #bbb', 
+  borderLeft: '2px solid #888',
+  borderRight: '2px solid #888',
+  borderBottom: '2px solid #888',
+  padding: '0 4px', 
+  boxSizing: 'border-box'
+};
+
+const customScrollbarTrackStyle = {
+  flex: 1, 
+  height: 12, 
+  background: '#e3e7ef', 
+  borderRadius: 8, 
+  position: 'relative', 
+  margin: '0 4px', 
+  overflow: 'hidden'
+};
+
+const customScrollbarThumbStyle = {
+  position: 'absolute', 
+  height: 12, 
+  background: '#888', 
+  borderRadius: 8, 
+  cursor: 'pointer', 
+  top: 0
+};
+
+const customScrollbarArrowStyle = {
+  width: 18, 
+  height: 18, 
+  background: '#e3e7ef', 
+  border: '1px solid #bbb', 
+  borderRadius: 8, 
+  display: 'flex', 
+  alignItems: 'center', 
+  justifyContent: 'center', 
+  fontSize: 16, 
+  color: '#888', 
+  cursor: 'pointer', 
+  userSelect: 'none'
+};
+
 const FilteringRule = () => {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -27,25 +79,48 @@ const FilteringRule = () => {
 
   // Custom scrollbar state
   const tableScrollRef = useRef(null);
-  const [scrollState, setScrollState] = useState({ top: 0, height: 0, scrollHeight: 0 });
+  const [scrollState, setScrollState] = useState({ left: 0, width: 0, scrollWidth: 0 });
+
+  useEffect(() => {
+    const el = tableScrollRef.current;
+    if (el) {
+      setScrollState({ left: el.scrollLeft, width: el.clientWidth, scrollWidth: el.scrollWidth });
+    }
+  }, [rows.length]);
 
   const handleTableScroll = (e) => {
     setScrollState({
-      top: e.target.scrollTop,
-      height: e.target.clientHeight,
-      scrollHeight: e.target.scrollHeight,
+      left: e.target.scrollLeft,
+      width: e.target.clientWidth,
+      scrollWidth: e.target.scrollWidth,
     });
   };
 
-  useEffect(() => {
+  const handleScrollbarDrag = (e) => {
+    const track = e.target.parentNode;
+    const rect = track.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percent = Math.max(0, Math.min(1, x / rect.width));
+    const newScrollLeft = (scrollState.scrollWidth - scrollState.width) * percent;
     if (tableScrollRef.current) {
-      setScrollState({
-        top: tableScrollRef.current.scrollTop,
-        height: tableScrollRef.current.clientHeight,
-        scrollHeight: tableScrollRef.current.scrollHeight,
-      });
+      tableScrollRef.current.scrollLeft = newScrollLeft;
     }
-  }, [rows.length]);
+  };
+
+  const handleArrowClick = (dir) => {
+    if (tableScrollRef.current) {
+      const delta = dir === 'left' ? -100 : 100;
+      tableScrollRef.current.scrollLeft += delta;
+    }
+  };
+
+  // Custom scrollbar thumb calculations
+  const thumbWidth = scrollState.width && scrollState.scrollWidth
+    ? Math.max(40, (scrollState.width / scrollState.scrollWidth) * (scrollState.width - 8))
+    : 40;
+  const thumbLeft = scrollState.width && scrollState.scrollWidth && scrollState.scrollWidth > scrollState.width
+    ? ((scrollState.left / (scrollState.scrollWidth - scrollState.width)) * (scrollState.width - thumbWidth - 16))
+    : 0;
 
   const openModal = (rowIdx = null) => {
     setEditIndex(rowIdx);
@@ -101,26 +176,38 @@ const FilteringRule = () => {
     ...Array.from({ length: Math.max(0, MIN_ROWS - rows.length) }).map(() => null),
   ];
 
-  // Custom scrollbar logic (same as Number Pool)
-  const thumbArea = 400 - 40;
-  const thumbHeight = scrollState.height && scrollState.scrollHeight ? Math.max(30, (scrollState.height / scrollState.scrollHeight) * thumbArea) : 30;
-  const maxThumbTop = thumbArea - thumbHeight;
-  const thumbTop = scrollState.height && scrollState.scrollHeight && scrollState.scrollHeight > scrollState.height ? ((scrollState.top / (scrollState.scrollHeight - scrollState.height)) * maxThumbTop) : 0;
-
   return (
     <div className="bg-white min-h-screen p-2 md:p-6">
-      <div className="w-full max-w-7xl mx-auto">
+      <div className="w-full mx-auto">
         <div className="flex flex-col gap-6">
           <div className="bg-white border-2 border-gray-300 rounded-lg shadow-sm w-full min-h-[400px] flex flex-col">
             <div className="w-full h-8 bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] rounded-t-lg flex items-center font-semibold text-[17px] text-[#222] justify-center border-b-2 border-gray-300">Filtering Rule</div>
-            <div className="overflow-x-auto w-full" style={{ height: 400 }}>
-              <table className="w-full min-w-[1400px] border border-gray-300 border-collapse whitespace-nowrap" style={{ tableLayout: 'auto' }}>
+            <div 
+              ref={tableScrollRef}
+              onScroll={handleTableScroll}
+              className="overflow-x-auto w-full" 
+              style={{ 
+                height: 400,
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none'
+              }}
+            >
+              <table className="w-full border border-gray-300 border-collapse whitespace-nowrap" style={{ tableLayout: 'auto', minWidth: '1800px' }}>
                 <thead>
                   <tr>
                     {FILTERING_RULE_COLUMNS.map((col, i) => (
-                      <th key={col.key} className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">{col.label}</th>
+                      <th key={col.key} className="bg-white text-gray-900 font-semibold text-xs border border-gray-300 px-4 py-2 text-center" style={{ 
+                        minWidth: col.key === 'description' ? '180px' : 
+                                  col.key === 'callerIdPoolWhitelist' || col.key === 'callerIdPoolBlacklist' || 
+                                  col.key === 'calleeIdPoolWhitelist' || col.key === 'calleeIdPoolBlacklist' ||
+                                  col.key === 'originalCallerIdPoolWhitelist' || col.key === 'originalCallerIdPoolBlacklist' ? '160px' :
+                                  col.key === 'callerIdWhitelist' || col.key === 'calleeIdWhitelist' ||
+                                  col.key === 'callerIdBlacklist' || col.key === 'calleeIdBlacklist' ? '140px' :
+                                  col.key === 'modify' ? '100px' : '100px'
+                      }}>
+                        {col.label}
+                      </th>
                     ))}
-                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Modify</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -128,23 +215,44 @@ const FilteringRule = () => {
                     row ? (
                       <tr key={idx}>
                         {FILTERING_RULE_COLUMNS.map((col) => (
-                          <td key={col.key} className="border border-gray-300 px-2 py-1 text-center bg-white">{row[col.key]}</td>
+                          <td key={col.key} className="border border-gray-300 px-4 py-2 text-center bg-white">
+                            {col.key === 'modify' ? (
+                              <EditDocumentIcon style={{ color: '#0e8fd6', cursor: 'pointer', margin: '0 auto' }} onClick={() => openModal(idx)} />
+                            ) : (
+                              <span className="text-xs">{row[col.key]}</span>
+                            )}
+                          </td>
                         ))}
-                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">
-                          <EditDocumentIcon style={{ color: '#0e8fd6', cursor: 'pointer', margin: '0 auto' }} onClick={() => openModal(idx)} />
-                        </td>
                       </tr>
                     ) : (
                       <tr key={idx}>
                         {FILTERING_RULE_COLUMNS.map((col) => (
-                          <td key={col.key} className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                          <td key={col.key} className="border border-gray-300 px-4 py-2 text-center bg-white">&nbsp;</td>
                         ))}
-                        <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
                       </tr>
                     )
                   )}
                 </tbody>
               </table>
+            </div>
+            {/* Custom scrollbar row */}
+            <div style={customScrollbarRowStyle}>
+              <div style={customScrollbarArrowStyle} onClick={() => handleArrowClick('left')}>&#9664;</div>
+              <div
+                style={customScrollbarTrackStyle}
+                onClick={handleScrollbarDrag}
+              >
+                <div
+                  style={{
+                    ...customScrollbarThumbStyle,
+                    width: thumbWidth,
+                    left: thumbLeft,
+                  }}
+                  draggable
+                  onDrag={handleScrollbarDrag}
+                />
+              </div>
+              <div style={customScrollbarArrowStyle} onClick={() => handleArrowClick('right')}>&#9654;</div>
             </div>
           </div>
           <div className="flex flex-wrap gap-2 justify-between items-center mt-2">

@@ -133,45 +133,45 @@ const IPRoutingTable = () => {
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full border-collapse w-full">
-            <thead>
-              <tr>
-                {IP_ROUTING_TABLE_COLUMNS.map((col) => (
+              <thead>
+                <tr>
+                  {IP_ROUTING_TABLE_COLUMNS.map((col) => (
                   <th key={col.key} className="bg-white text-gray-800 font-semibold text-[15px] border border-gray-300 px-2 py-2 whitespace-nowrap text-center" style={{ minWidth: col.width }}>{col.label}</th>
-                ))}
-              </tr>
-            </thead>
+                  ))}
+                </tr>
+              </thead>
             <tbody ref={tableScrollRef} onScroll={handleTableScroll}>
-              {displayRows.map((row, idx) =>
-                row ? (
-                  <tr key={idx}>
+                {displayRows.map((row, idx) =>
+                  row ? (
+                    <tr key={idx}>
                     <td className="border border-gray-300 px-2 py-2 text-center">
-                      <input type="checkbox" checked={row.checked || false} onChange={() => handleCheck(idx)} />
-                    </td>
+                        <input type="checkbox" checked={row.checked || false} onChange={() => handleCheck(idx)} />
+                      </td>
                     <td className="border border-gray-300 px-2 py-2 text-center">{row.no}</td>
                     <td className="border border-gray-300 px-2 py-2 text-center">{row.destination}</td>
                     <td className="border border-gray-300 px-2 py-2 text-center">{row.gateway}</td>
                     <td className="border border-gray-300 px-2 py-2 text-center">{row.subnetMask}</td>
                     <td className="border border-gray-300 px-2 py-2 text-center">{row.networkPort}</td>
                     <td className="border border-gray-300 px-2 py-2 text-center">
-                      <EditDocumentIcon style={{ color: '#1976d2', fontSize: 22, cursor: 'pointer' }} onClick={() => openModal(idx)} />
-                    </td>
-                  </tr>
-                ) : (
-                  <tr key={idx}>
-                    {IP_ROUTING_TABLE_COLUMNS.map((col) => (
+                        <EditDocumentIcon style={{ color: '#1976d2', fontSize: 22, cursor: 'pointer' }} onClick={() => openModal(idx)} />
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr key={idx}>
+                      {IP_ROUTING_TABLE_COLUMNS.map((col) => (
                       <td key={col.key} className="border border-gray-300 px-2 py-2 text-center h-10"></td>
-                    ))}
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
+                      ))}
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
       {/* Button Row OUTSIDE the bordered box */}
       <div className="flex flex-col sm:flex-row justify-between items-center w-full max-w-[1400px] px-4 py-4 gap-4 bg-[#f4f6fa] mt-2">
-        <div className="flex gap-2">
-          <Button variant="contained" sx={grayButtonSx} onClick={handleDelete}>Delete</Button>
+          <div className="flex gap-2">
+            <Button variant="contained" sx={grayButtonSx} onClick={handleDelete}>Delete</Button>
           <Button variant="contained" sx={grayButtonSx} onClick={handleClearAll}>Clear All</Button>
         </div>
         <Button variant="contained" sx={blueButtonSx} onClick={() => openModal(null)}>Add New</Button>

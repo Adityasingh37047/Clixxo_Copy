@@ -27,7 +27,7 @@ const ICONS = [
 ];
 
 const colorBlock = (color) => (
-  <div className="w-4 h-4 mx-auto border border-gray-500" style={{ background: color, borderRadius: 0 }} />
+  <div className="w-3 h-3 mx-auto border border-gray-500" style={{ background: color, borderRadius: 0 }} />
 );
 
 const TOTAL_PAGES = 5;
@@ -72,24 +72,24 @@ const PstnStatus = () => {
 
   return (
     <div className="bg-white min-h-[calc(100vh-80px)] p-2 sm:p-4 md:p-8 flex flex-col items-center">
-      <div className="w-full max-w-7xl">
+      <div className="w-full max-w-full">
         {/* Sync & Signaling Status Table */}
         <div className="w-full h-9 bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] rounded-t-lg flex items-center font-semibold text-base shadow mb-0 pl-4" />
         <div className="overflow-x-auto w-full">
-          <table className="w-full bg-white border-collapse mb-20 shadow-sm min-w-[600px] text-[11px] sm:text-xs">
+          <table className="w-full bg-white border-collapse mb-20 shadow-sm text-xs sm:text-sm">
             <thead>
               <tr>
-                <th className="border border-gray-300 bg-[#f8fafd] font-semibold py-1 px-2">{PSTN_SYNC_HEADERS[0]}</th>
+                <th className="border border-gray-400 bg-[#f8fafd] font-semibold py-2 px-3">{PSTN_SYNC_HEADERS[0]}</th>
                 {PSTN_SYNC_HEADERS.slice(1).map((h, i) => (
-                  <th key={i} className="border border-gray-300 bg-[#f8fafd] text-gray-800 font-semibold py-1 px-2">{h}</th>
+                  <th key={i} className="border border-gray-400 bg-[#f8fafd] text-gray-800 font-semibold py-2 px-3">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="border border-gray-300 bg-[#f8fafd] font-semibold py-1 px-2 text-center">Color</td>
+                <td className="border border-gray-400 bg-[#f8fafd] font-semibold py-2 px-3 text-center">Color</td>
                 {PSTN_SYNC_COLORS.map((c, i) => (
-                  <td key={i} className="border border-gray-300 text-center py-1 px-2">{colorBlock(c.color)}</td>
+                  <td key={i} className="border border-gray-400 text-center py-2 px-3">{colorBlock(c.color)}</td>
                 ))}
               </tr>
             </tbody>
@@ -99,26 +99,26 @@ const PstnStatus = () => {
         {/* Voice Path Status Table */}
         <div className="w-full h-9 bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] rounded-t-lg flex items-center font-semibold text-base shadow mb-0 pl-4" />
         <div className="overflow-x-auto w-full">
-          <table className="w-full bg-white border-collapse shadow-sm min-w-[800px] text-[11px] sm:text-xs">
+          <table className="w-full bg-white border-collapse shadow-sm text-xs sm:text-sm">
             <thead>
               <tr>
-                <th className="border border-gray-300 bg-[#f8fafd] font-semibold py-1 px-2">{PSTN_VOICE_PATH_HEADERS[0]}</th>
+                <th className="border border-gray-400 bg-[#f8fafd] font-semibold py-2 px-3">{PSTN_VOICE_PATH_HEADERS[0]}</th>
                 {PSTN_VOICE_PATH_HEADERS.slice(1).map((h, i) => (
-                  <th key={i} className="border border-gray-300 bg-[#f8fafd] text-gray-800 font-semibold py-1 px-2">{h}</th>
+                  <th key={i} className="border border-gray-400 bg-[#f8fafd] text-gray-800 font-semibold py-2 px-3">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="border border-gray-300 bg-[#f8fafd] font-semibold py-1 px-2 text-center">Icon</td>
+                <td className="border border-gray-400 bg-[#f8fafd] font-semibold py-2 px-3 text-center">Icon</td>
                 {ICONS.map((icon, i) => (
-                  <td key={i} className="border border-gray-300 text-center py-1 px-2"><span className="text-lg">{icon}</span></td>
+                  <td key={i} className="border border-gray-400 text-center py-2 px-3"><span className="text-lg">{icon}</span></td>
                 ))}
               </tr>
               <tr>
-                <td className="border border-gray-300 bg-[#f8fafd] font-semibold py-1 px-2 text-center">Statistics</td>
+                <td className="border border-gray-400 bg-[#f8fafd] font-semibold py-2 px-3 text-center">Statistics</td>
                 {PSTN_VOICE_PATH_STATS[0].values.map((v, i) => (
-                  <td key={i} className="border border-gray-300 text-center py-1 px-2">{v}</td>
+                  <td key={i} className="border border-gray-400 text-center py-2 px-3">{v}</td>
                 ))}
               </tr>
             </tbody>
@@ -145,22 +145,21 @@ const PstnStatus = () => {
           </span>
         </div>
         <div className="overflow-x-auto w-full">
-          <table className="w-full bg-white border-collapse shadow-sm min-w-[600px] text-[10px] sm:text-xs">
+          <table className="w-full bg-white border-collapse shadow-sm text-xs">
             <thead>
               <tr>
-                <th className="border border-gray-300 bg-[#f8fafd] font-semibold py-1 px-2 whitespace-pre-line">Time Slot
-No.</th>
+                <th className="border border-gray-400 bg-[#f8fafd] font-semibold py-1 px-1 whitespace-nowrap text-xs w-20">Time Slot No.</th>
                 {PSTN_TIMESLOT_HEADERS.slice(1).map((h, i) => (
-                  <th key={i} className="border border-gray-300 bg-[#f8fafd] text-gray-800 font-semibold py-1 px-2 whitespace-nowrap">{h}</th>
+                  <th key={i} className="border border-gray-400 bg-[#f8fafd] text-gray-800 font-semibold py-1 px-1 whitespace-nowrap text-xs w-8">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {PSTN_TIMESLOT_DATA.map((row, idx) => (
                 <tr key={idx}>
-                  <td className="border border-gray-300 bg-[#f8fafd] font-semibold py-1 px-2 whitespace-nowrap">{row.label}</td>
+                  <td className="border border-gray-400 bg-[#f8fafd] font-semibold py-1 px-1 whitespace-nowrap text-xs w-20 text-center">{row.label}</td>
                   {row.values.map((v, i) => (
-                    <td key={i} className="border border-gray-300 text-center py-1 px-2">{v === 'red' ? colorBlock('#e53935') : colorBlock('#e0e0e0')}</td>
+                    <td key={i} className="border border-gray-400 text-center py-1 px-1 w-8">{v === 'red' ? colorBlock('#e53935') : colorBlock('#e0e0e0')}</td>
                   ))}
                 </tr>
               ))}

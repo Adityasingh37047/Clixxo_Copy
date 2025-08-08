@@ -96,13 +96,14 @@ const legacyModalButtonBar = { display: 'flex', justifyContent: 'center', gap: 1
 const legacySaveButton = { background: 'linear-gradient(to bottom, #3bb6f5 0%, #0e8fd6 100%)', color: '#fff', fontWeight: 600, fontSize: 15, border: '1px solid #1976d2', borderRadius: 4, padding: '6px 32px', minWidth: 90, boxShadow: '0 2px 6px #0002', cursor: 'pointer' };
 const legacyCloseButton = { background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)', color: '#222', fontWeight: 600, fontSize: 15, border: '1px solid #bbb', borderRadius: 4, padding: '6px 32px', minWidth: 90, boxShadow: '0 2px 6px #0002', cursor: 'pointer' };
 
-const MIN_ROWS = 10;
+const MIN_ROWS = 12;
 
 const NumberPool = () => {
   const [rows, setRows] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editIndex, setEditIndex] = useState(null);
-  const [form, setForm] = useState({ groupNo: 0, noInGroup: 1, numberRangeStart: '', numberRangeEnd: '' });
+  const [form, setForm] = useState({ groupNo: 0, noInGroup: 0, numberRangeStart: '', numberRangeEnd: '' });
+  const [validationError, setValidationError] = useState('');
 
   // Custom scrollbar state
   const tableScrollRef = useRef(null);
@@ -126,8 +127,26 @@ const NumberPool = () => {
     }
   }, [rows.length]);
 
+  const validateNumberRange = (start, end) => {
+    if (!start || !end) return '';
+    
+    const startDigits = start.toString().length;
+    const endDigits = end.toString().length;
+    
+    if (startDigits !== endDigits) {
+      return `Error: Start and End numbers must have the same number of digits. Start has ${startDigits} digit(s), End has ${endDigits} digit(s).`;
+    }
+    
+    if (parseInt(start) > parseInt(end)) {
+      return 'Error: Start number cannot be greater than End number.';
+    }
+    
+    return '';
+  };
+
   const openModal = (rowIdx = null) => {
     setEditIndex(rowIdx);
+    setValidationError('');
     if (rowIdx !== null) {
       const row = rows[rowIdx];
       // Split numberRange if possible
@@ -137,7 +156,11 @@ const NumberPool = () => {
       }
       setForm({ groupNo: row.groupNo, noInGroup: row.noInGroup, numberRangeStart: start, numberRangeEnd: end });
     } else {
-      setForm({ groupNo: 0, noInGroup: 1, numberRangeStart: '', numberRangeEnd: '' });
+      // Calculate the next "No. in Group" value based on existing entries in the selected group
+      const selectedGroup = 0; // Default group
+      const entriesInGroup = rows.filter(row => row.groupNo === selectedGroup);
+      const nextNoInGroup = entriesInGroup.length;
+      setForm({ groupNo: selectedGroup, noInGroup: nextNoInGroup, numberRangeStart: '', numberRangeEnd: '' });
     }
     setModalOpen(true);
   };
@@ -145,14 +168,37 @@ const NumberPool = () => {
   const closeModal = () => {
     setModalOpen(false);
     setEditIndex(null);
+    setValidationError('');
   };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    if (name === 'groupNo') {
+      // When Group No. changes, recalculate No. in Group based on entries in the new group
+      const newGroupNo = Number(value);
+      const entriesInGroup = rows.filter(row => row.groupNo === newGroupNo);
+      const nextNoInGroup = entriesInGroup.length;
+      setForm((prev) => ({ ...prev, [name]: newGroupNo, noInGroup: nextNoInGroup }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+      
+      // Validate number range when either start or end changes
+      if (name === 'numberRangeStart' || name === 'numberRangeEnd') {
+        const newForm = { ...form, [name]: value };
+        const error = validateNumberRange(newForm.numberRangeStart, newForm.numberRangeEnd);
+        setValidationError(error);
+      }
+    }
   };
 
   const handleSave = () => {
+    // Final validation before saving
+    const error = validateNumberRange(form.numberRangeStart, form.numberRangeEnd);
+    if (error) {
+      setValidationError(error);
+      return;
+    }
+
     const numberRange = form.numberRangeStart && form.numberRangeEnd ? `${form.numberRangeStart}--${form.numberRangeEnd}` : '';
     if (editIndex !== null) {
       const updatedRows = [...rows];
@@ -265,7 +311,23 @@ const NumberPool = () => {
             <div className="flex flex-col gap-0 w-full">
               <div className="flex items-center gap-2 mb-4">
                 <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">Group No.:</label>
-                <MuiSelect name="groupNo" value={form.groupNo} onChange={handleFormChange} size="small" fullWidth variant="outlined" sx={{ fontSize: 14 }}>
+                <MuiSelect 
+                  name="groupNo" 
+                  value={form.groupNo} 
+                  onChange={handleFormChange} 
+                  size="small" 
+                  fullWidth 
+                  variant="outlined" 
+                  sx={{ fontSize: 14 }}
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 200,
+                        overflow: 'auto'
+                      }
+                    }
+                  }}
+                >
                   {NUMBER_POOL_GROUPS.map((g) => (
                     <MenuItem key={g.value} value={g.value} sx={{ fontSize: 14 }}>{g.label}</MenuItem>
                   ))}
@@ -273,7 +335,24 @@ const NumberPool = () => {
               </div>
               <div className="flex items-center gap-2 mb-4">
                 <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">No. in Group:</label>
-                <TextField name="noInGroup" type="text" value={form.noInGroup} onChange={handleFormChange} size="small" fullWidth variant="outlined" inputProps={{ style: { fontSize: 14, padding: '3px 6px' } }} />
+                <TextField 
+                  name="noInGroup" 
+                  type="text" 
+                  value={form.noInGroup} 
+                  size="small" 
+                  fullWidth 
+                  variant="outlined" 
+                  inputProps={{ 
+                    style: { fontSize: 14, padding: '3px 6px' },
+                    readOnly: true
+                  }}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      backgroundColor: '#f5f5f5',
+                      color: '#666'
+                    }
+                  }}
+                />
               </div>
               <div className="flex items-center gap-2 mb-4">
                 <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">Number Range:</label>
@@ -281,6 +360,9 @@ const NumberPool = () => {
                 <span className="mx-1">--</span>
                 <TextField name="numberRangeEnd" type="text" value={form.numberRangeEnd} onChange={handleFormChange} size="small" fullWidth variant="outlined" inputProps={{ style: { fontSize: 14, padding: '3px 6px' }, placeholder: 'End' }} />
               </div>
+              {validationError && (
+                <div className="text-red-500 text-sm mt-2 mb-4 text-center">{validationError}</div>
+              )}
             </div>
           </DialogContent>
           <DialogActions className="p-6 pt-2 justify-center gap-6">

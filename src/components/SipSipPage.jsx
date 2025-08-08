@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { SIP_SETTINGS_FIELDS, SIP_SETTINGS_NOTE } from '../constants/SipSipConstants';
 import Button from '@mui/material/Button';
+import { Select, MenuItem, FormControl } from '@mui/material';
 
 const blueBarStyle = {
   width: '100%',
@@ -90,7 +91,15 @@ const selectStyle = {
 const getInitialState = () => {
   const state = {};
   SIP_SETTINGS_FIELDS.forEach(f => {
-    state[f.key] = f.default;
+    if (f.type === 'select') {
+      state[f.key] = f.options[0]; // Set first option as default for select fields
+    } else if (f.type === 'checkbox') {
+      state[f.key] = f.default || false; // Set checkbox default to false if not specified
+    } else if (f.type === 'radio') {
+      state[f.key] = f.options[0]; // Set first option as default for radio fields
+    } else {
+      state[f.key] = f.default || ''; // Set text fields default to empty string if not specified
+    }
   });
   return state;
 };
@@ -140,24 +149,55 @@ const SipSipPage = () => {
                 {field.type === 'text' && (
                   <div className="w-full md:w-[350px] flex items-center ml-0 md:ml-[300px]">
                     <input
-                      type="text"
+                      type={field.key === 'calledPrefix' ? 'text' : 'number'}
                       value={form[field.key]}
                       className="flex-1.5 text-base px-3 py-1.5 rounded border border-gray-500 min-w-[200px] max-w-[350px] bg-white"
-                      onChange={e => handleChange(field.key, e.target.value)}
+                      onChange={e => {
+                        const value = e.target.value;
+                        if (field.key === 'calledPrefix') {
+                          // Allow only numbers and colons for Called Number Prefix
+                          if (/^[0-9:]*$/.test(value) && value.split(':').length <= 6) {
+                            handleChange(field.key, value);
+                          }
+                        } else {
+                          // For other number fields, allow only numbers (strict validation)
+                          if (/^\d*$/.test(value) || value === '') {
+                            handleChange(field.key, value);
+                          }
+                        }
+                      }}
+                      onKeyPress={e => {
+                        if (field.key !== 'calledPrefix') {
+                          // Prevent non-numeric characters for number fields
+                          if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'Enter') {
+                            e.preventDefault();
+                          }
+                        } else {
+                          // For calledPrefix, allow numbers and colons only
+                          if (!/[0-9:]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'Enter') {
+                            e.preventDefault();
+                          }
+                        }
+                      }}
+                      placeholder={field.key === 'calledPrefix' ? 'e.g., 123:456:789' : ''}
                     />
                   </div>
                 )}
                 {field.type === 'select' && (
                   <div className="w-full md:w-[350px] flex items-center ml-0 md:ml-[300px]">
-                    <select
-                      value={form[field.key]}
-                      className="flex-1.5 text-base px-3 py-1.5 rounded border border-gray-500 min-w-[200px] max-w-[350px] bg-white"
-                      onChange={e => handleChange(field.key, e.target.value)}
-                    >
-                      {field.options.map(opt => (
-                        <option key={opt} value={opt}>{opt}</option>
-                      ))}
-                    </select>
+                    <FormControl size="small" className="w-full">
+                      <Select
+                        value={form[field.key]}
+                        onChange={e => handleChange(field.key, e.target.value)}
+                        fullWidth
+                        variant="outlined"
+                        sx={{ fontSize: 16 }}
+                      >
+                        {field.options.map(opt => (
+                          <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
                   </div>
                 )}
                 {field.type === 'checkbox' && (

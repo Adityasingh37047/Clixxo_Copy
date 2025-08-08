@@ -41,7 +41,7 @@ const textareaStyle = {
   height: 220,
   resize: 'vertical',
   fontSize: 16,
-  border: '1px solid #bbb',
+  border: '2px solid #9ca3af', // Changed to match border-gray-400
   borderTop: 'none',
   background: '#fff',
   padding: 12,

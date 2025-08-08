@@ -63,7 +63,7 @@ const AccessControl = () => {
       {/* Iptables Info */}
       <div className="flex flex-col items-center w-full">
         <div className="text-gray-500 text-base font-normal mb-2 ml-2 w-full max-w-[700px] text-left">Iptables Info</div>
-        <div className="w-full max-w-[700px] bg-white border border-gray-400 rounded-md shadow-sm overflow-y-auto p-4" style={{ minHeight: 180, maxHeight: 260 }}>
+        <div className="w-full max-w-[700px] bg-white border border-gray-400 rounded-md shadow-sm overflow-y-auto p-4 resize-y" style={{ minHeight: 180, maxHeight: 380 }}>
           {editMode ? (
             <TextField
               className="w-full"

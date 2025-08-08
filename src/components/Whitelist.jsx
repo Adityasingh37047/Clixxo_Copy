@@ -10,14 +10,26 @@ const Whitelist = () => {
   const [calleeSearch, setCalleeSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('caller');
-  const [modalData, setModalData] = useState({ groupNo: '0', noInGroup: '1', idValue: '' });
+  const [modalData, setModalData] = useState({ groupNo: '0', noInGroup: '0', idValue: '' });
   const [callerChecked, setCallerChecked] = useState([]);
   const [calleeChecked, setCalleeChecked] = useState([]);
 
   const handleAddNew = (type) => {
     setModalType(type);
-    setModalData({ groupNo: '0', noInGroup: '1', idValue: '' });
+    // Calculate the next "No. in Group" value based on existing entries in the selected group
+    const existingRows = type === 'caller' ? callerRows : calleeRows;
+    const selectedGroup = '0'; // Default group
+    const entriesInGroup = existingRows.filter(row => row.groupNo === selectedGroup);
+    const nextNoInGroup = entriesInGroup.length.toString();
+    setModalData({ groupNo: selectedGroup, noInGroup: nextNoInGroup, idValue: '' });
     setShowModal(true);
+  };
+
+  const handleGroupNoChange = (newGroupNo) => {
+    const existingRows = modalType === 'caller' ? callerRows : calleeRows;
+    const entriesInGroup = existingRows.filter(row => row.groupNo === newGroupNo);
+    const nextNoInGroup = entriesInGroup.length.toString();
+    setModalData({ ...modalData, groupNo: newGroupNo, noInGroup: nextNoInGroup });
   };
 
   const handleSave = () => {
@@ -38,7 +50,7 @@ const Whitelist = () => {
 
   return (
     <div className="bg-white min-h-screen p-2 md:p-6">
-      <div className="flex flex-col md:flex-row gap-6 w-full max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row gap-6 w-full mx-auto">
         {/* CallerID Table */}
         <div className="flex-1">
           <div className="flex items-center mb-3 gap-3">
@@ -49,35 +61,35 @@ const Whitelist = () => {
           <div className="bg-white border-2 border-gray-300 rounded-lg shadow-sm w-full min-h-[400px] flex flex-col">
             <div className="w-full h-8 bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] rounded-t-lg flex items-center font-semibold text-[17px] text-[#222] justify-center border-b-2 border-gray-300">CallerID Whitelist</div>
             <div className="overflow-x-auto w-full" style={{ height: 400 }}>
-              <table className="min-w-[420px] w-full border border-gray-300 border-collapse">
+              <table className="w-full border border-gray-300 border-collapse" style={{ minWidth: '600px' }}>
                 <thead>
                   <tr>
-                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Check</th>
-                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Group No.</th>
-                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">No. in Group</th>
-                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">CallerID</th>
-                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Modify</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-4 py-2 text-center" style={{ minWidth: '80px' }}>Check</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-4 py-2 text-center" style={{ minWidth: '120px' }}>Group No.</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-4 py-2 text-center" style={{ minWidth: '140px' }}>No. in Group</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-4 py-2 text-center" style={{ minWidth: '180px' }}>CallerID</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-4 py-2 text-center" style={{ minWidth: '100px' }}>Modify</th>
                   </tr>
                 </thead>
                 <tbody>
                   {callerRows.map((row, idx) => (
                     <tr key={idx}>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white"><input type="checkbox" checked={callerChecked.includes(idx)} onChange={() => handleCallerCheck(idx)} /></td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.groupNo}</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.noInGroup}</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.callerId}</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white"><input type="checkbox" checked={callerChecked.includes(idx)} onChange={() => handleCallerCheck(idx)} /></td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">{row.groupNo}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">{row.noInGroup}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">{row.callerId}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">
                         <EditDocumentIcon style={{ color: '#0e8fd6', cursor: 'pointer', margin: '0 auto' }} />
                       </td>
                     </tr>
                   ))}
                   {Array.from({ length: Math.max(0, 10 - callerRows.length) }).map((_, idx) => (
                     <tr key={`empty-caller-${idx}`}> 
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">&nbsp;</td>
                     </tr>
                   ))}
                 </tbody>
@@ -102,35 +114,35 @@ const Whitelist = () => {
           <div className="bg-white border-2 border-gray-300 rounded-lg shadow-sm w-full min-h-[400px] flex flex-col">
             <div className="w-full h-8 bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] rounded-t-lg flex items-center font-semibold text-[17px] text-[#222] justify-center border-b-2 border-gray-300">CalleeID Whitelist</div>
             <div className="overflow-x-auto w-full" style={{ height: 400 }}>
-              <table className="min-w-[420px] w-full border border-gray-300 border-collapse">
+              <table className="w-full border border-gray-300 border-collapse" style={{ minWidth: '600px' }}>
                 <thead>
                   <tr>
-                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Check</th>
-                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Group No.</th>
-                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">No. in Group</th>
-                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">CalleeID</th>
-                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-2 py-1 text-center">Modify</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-4 py-2 text-center" style={{ minWidth: '80px' }}>Check</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-4 py-2 text-center" style={{ minWidth: '120px' }}>Group No.</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-4 py-2 text-center" style={{ minWidth: '140px' }}>No. in Group</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-4 py-2 text-center" style={{ minWidth: '180px' }}>CalleeID</th>
+                    <th className="bg-white text-gray-900 font-semibold text-[15px] border border-gray-300 px-4 py-2 text-center" style={{ minWidth: '100px' }}>Modify</th>
                   </tr>
                 </thead>
                 <tbody>
                   {calleeRows.map((row, idx) => (
                     <tr key={idx}>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white"><input type="checkbox" checked={calleeChecked.includes(idx)} onChange={() => handleCalleeCheck(idx)} /></td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.groupNo}</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.noInGroup}</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">{row.calleeId}</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white"><input type="checkbox" checked={calleeChecked.includes(idx)} onChange={() => handleCalleeCheck(idx)} /></td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">{row.groupNo}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">{row.noInGroup}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">{row.calleeId}</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">
                         <EditDocumentIcon style={{ color: '#0e8fd6', cursor: 'pointer', margin: '0 auto' }} />
                       </td>
                     </tr>
                   ))}
                   {Array.from({ length: Math.max(0, 10 - calleeRows.length) }).map((_, idx) => (
                     <tr key={`empty-callee-${idx}`}> 
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
-                      <td className="border border-gray-300 px-2 py-1 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">&nbsp;</td>
+                      <td className="border border-gray-300 px-4 py-2 text-center bg-white">&nbsp;</td>
                     </tr>
                   ))}
                 </tbody>
@@ -158,15 +170,46 @@ const Whitelist = () => {
           <div className="flex flex-col gap-0 w-full">
             <div className="flex items-center gap-2 mb-4">
               <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">Group No.:</label>
-              <MuiSelect value={modalData.groupNo} onChange={e => setModalData({ ...modalData, groupNo: e.target.value })} size="small" fullWidth variant="outlined" sx={{ fontSize: 14 }}>
-                {[...Array(10).keys()].map(i => (
+              <MuiSelect 
+                value={modalData.groupNo} 
+                onChange={e => handleGroupNoChange(e.target.value)} 
+                size="small" 
+                fullWidth 
+                variant="outlined" 
+                sx={{ fontSize: 14 }}
+                MenuProps={{
+                  PaperProps: {
+                    style: {
+                      maxHeight: 200,
+                      overflow: 'auto'
+                    }
+                  }
+                }}      
+              >
+                {[...Array(200).keys()].map(i => (
                   <MenuItem key={i} value={i} sx={{ fontSize: 14 }}>{i}</MenuItem>
                 ))}
               </MuiSelect>
             </div>
             <div className="flex items-center gap-2 mb-4">
               <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">No. in Group:</label>
-              <TextField type="text" value={modalData.noInGroup} onChange={e => setModalData({ ...modalData, noInGroup: e.target.value })} size="small" fullWidth variant="outlined" inputProps={{ style: { fontSize: 14, padding: '3px 6px' } }} />
+              <TextField 
+                type="text" 
+                value={modalData.noInGroup} 
+                size="small" 
+                fullWidth 
+                variant="outlined" 
+                inputProps={{ 
+                  style: { fontSize: 14, padding: '3px 6px' },
+                  readOnly: true
+                }}
+                sx={{
+                  '& .MuiInputBase-input': {
+                    backgroundColor: '#f5f5f5',
+                    color: '#666'
+                  }
+                }}
+              />
             </div>
             <div className="flex items-center gap-2 mb-4">
               <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left w-[110px]">{modalType === 'caller' ? 'CallerID:' : 'CalleeID:'}</label>

@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { CALLERID_POOL_TABLE_COLUMNS, CALLERID_POOL_MODAL_FIELDS, CALLERID_POOL_INITIAL_FORM } from '../constants/CallerIDPoolConstants';
 import EditDocumentIcon from '@mui/icons-material/EditDocument';
 import { Button, TextField, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel } from '@mui/material';
-
-const LOCAL_STORAGE_KEY_IP_PSTN = 'callerid_pool_rows_ip_pstn';
-const LOCAL_STORAGE_KEY_PSTN_IP = 'callerid_pool_rows_pstn_ip';
 
 const CallerIDPool = () => {
   // Top controls state
@@ -26,21 +23,6 @@ const CallerIDPool = () => {
   const [modalData, setModalData] = useState(CALLERID_POOL_INITIAL_FORM);
   const [editIndex, setEditIndex] = useState(null);
   const [modalTable, setModalTable] = useState('ip_pstn'); // 'ip_pstn' or 'pstn_ip'
-
-  // Load from localStorage
-  useEffect(() => {
-    const savedIpPstn = localStorage.getItem(LOCAL_STORAGE_KEY_IP_PSTN);
-    if (savedIpPstn) setRowsIpPstn(JSON.parse(savedIpPstn));
-    const savedPstnIp = localStorage.getItem(LOCAL_STORAGE_KEY_PSTN_IP);
-    if (savedPstnIp) setRowsPstnIp(JSON.parse(savedPstnIp));
-  }, []);
-  // Save to localStorage
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY_IP_PSTN, JSON.stringify(rowsIpPstn));
-  }, [rowsIpPstn]);
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY_PSTN_IP, JSON.stringify(rowsPstnIp));
-  }, [rowsPstnIp]);
 
   // Checkbox handlers
   const handleCheck = (table, idx) => {
@@ -143,29 +125,31 @@ const CallerIDPool = () => {
         )
       : CALLERID_POOL_TABLE_COLUMNS;
     return (
-      <div className="w-full md:w-1/2 flex flex-col gap-2">
+      <div className="w-full md:w-[49%] flex flex-col gap-2">
         <div className="bg-white border-2 border-gray-400 rounded-lg shadow flex flex-col overflow-hidden">
           <div className="bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] h-10 flex items-center justify-center font-semibold text-lg text-black border-b-2 border-gray-400">
             {title}
           </div>
           <div className="overflow-x-auto w-full">
-            <table className="min-w-full border-collapse table-auto">
+            <table className="w-full border-collapse">
               <thead>
                 <tr>
                   {columns.map(col => (
-                    <th key={col.key} className="bg-white text-gray-800 font-semibold text-sm border border-gray-300 px-2 py-1 whitespace-nowrap text-center">{col.label}</th>
+                    <th key={col.key} className="bg-white text-gray-800 font-semibold text-xs border border-gray-300 px-2 py-2 text-center" style={{ minWidth: col.key === 'callerIdRange' ? '120px' : col.key === 'outgoingCallResource' ? '100px' : '60px' }}>
+                      <div className="break-words leading-tight">{col.label}</div>
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {rows.map((row, idx) => (
                   <tr key={idx}>
-                    <td className="border border-gray-300 px-2 py-1 text-center"><input type="checkbox" checked={checked.includes(idx)} onChange={() => handleCheck(tableKey, idx)} /></td>
-                    <td className="border border-gray-300 px-2 py-1 text-center">{row.no}</td>
-                    <td className="border border-gray-300 px-2 py-1 text-center">{row.callerIdRange}</td>
-                    <td className="border border-gray-300 px-2 py-1 text-center">{row.outgoingCallResource}</td>
-                    <td className="border border-gray-300 px-2 py-1 text-center">{row.destinationPcm}</td>
-                    <td className="border border-gray-300 px-2 py-1 text-center">
+                    <td className="border border-gray-300 px-2 py-2 text-center"><input type="checkbox" checked={checked.includes(idx)} onChange={() => handleCheck(tableKey, idx)} /></td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">{row.no}</td>
+                    <td className="border border-gray-300 px-2 py-2 text-center text-xs">{row.callerIdRange}</td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">{row.outgoingCallResource}</td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">{row.destinationPcm}</td>
+                    <td className="border border-gray-300 px-2 py-2 text-center">
                       <EditDocumentIcon style={{ color: '#1976d2', fontSize: 22, cursor: 'pointer' }} onClick={() => handleEdit(tableKey, idx)} />
                     </td>
                   </tr>
@@ -173,7 +157,7 @@ const CallerIDPool = () => {
                 {rows.length < 10 && Array.from({ length: 10 - rows.length }).map((_, i) => (
                   <tr key={rows.length + i}>
                     {columns.map((col, j) => (
-                      <td key={j} className="border border-gray-300 px-2 py-1 text-center text-gray-300">&nbsp;</td>
+                      <td key={j} className="border border-gray-300 px-2 py-2 text-center text-gray-300">&nbsp;</td>
                     ))}
                   </tr>
                 ))}
@@ -252,25 +236,24 @@ const CallerIDPool = () => {
   return (
     <div className="bg-white min-h-screen w-full p-0 m-0">
       {/* Top controls */}
-      <form onSubmit={handleSet} className="bg-white rounded-lg p-4 md:p-6 mb-4 border-none max-w-5xl mx-auto flex flex-col gap-4">
-        <div className="flex flex-col gap-4 w-full mb-2 md:flex-row md:items-center md:gap-4">
-          <div className="flex flex-col gap-4 w-full md:flex-row md:gap-4 md:flex-1">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full max-w-xs">
-              <span className="font-medium text-base text-left whitespace-normal leading-tight break-words">Manipulate IP-&gt;PSTN CallerIDs<br />with Designated Prefix:</span>
-              <TextField size="small" value={prefix} onChange={e => setPrefix(e.target.value)} className="w-full" variant="outlined" />
-            </div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full max-w-xs">
-              <span className="font-medium text-base text-left whitespace-normal leading-tight break-words">Starting Date:</span>
-              <TextField type="date" size="small" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full" variant="outlined" />
-            </div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full max-w-xs">
-              <span className="font-medium text-base text-left whitespace-normal leading-tight break-words">Usage Cycle (Day):</span>
-              <TextField type="number" size="small" value={usageCycle} onChange={e => setUsageCycle(e.target.value)} className="w-full" variant="outlined" />
-            </div>
+      <form onSubmit={handleSet} className="bg-white rounded-lg p-4 md:p-6 mb-4 border-none w-full mx-auto">
+        {/* First row - Manipulate IP->PSTN CallerIDs section */}
+        <div className="flex flex-wrap items-center gap-4 mb-4">
+          <div className="flex items-center justify-between gap-6 min-w-fit">
+            <span className="font-medium text-sm whitespace-nowrap">Manipulate IP-&gt;PSTN CallerIDs with Designated Prefix:</span>
+            <TextField size="small" value={prefix} onChange={e => setPrefix(e.target.value)} className="w-36" variant="outlined" />
           </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full max-w-xs md:ml-6">
-            <span className="font-medium text-base text-left whitespace-normal leading-tight break-words">Destination PCM:</span>
-            <FormControl size="small" className="w-full">
+          <div className="flex items-center justify-between gap-6 min-w-fit">
+            <span className="font-medium text-sm whitespace-nowrap">Starting Date:</span>
+            <TextField type="date" size="small" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-40" variant="outlined" />
+          </div>
+          <div className="flex items-center justify-between gap-6 min-w-fit">
+            <span className="font-medium text-sm whitespace-nowrap">Usage Cycle (Day):</span>
+            <TextField type="number" size="small" value={usageCycle} onChange={e => setUsageCycle(e.target.value)} className="w-28" variant="outlined" />
+          </div>
+          <div className="flex items-center justify-between gap-6 min-w-fit">
+            <span className="font-medium text-sm whitespace-nowrap">Destination PCM:</span>
+            <FormControl size="small" className="w-32">
               <Select value={destinationPcm} onChange={e => setDestinationPcm(e.target.value)} variant="outlined">
                 <MenuItem value="PCM">PCM</MenuItem>
                 <MenuItem value="Any">Any</MenuItem>
@@ -278,33 +261,38 @@ const CallerIDPool = () => {
             </FormControl>
           </div>
         </div>
-        <div className="flex flex-col gap-4 w-full mb-0 md:flex-row md:items-center md:gap-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full max-w-xs">
-            <span className="font-medium text-base text-left whitespace-normal leading-tight break-words">IP-&gt;PSTN Outbound Calls<br />with Designated CallerID:</span>
-            <TextField size="small" value={outboundCallerId} onChange={e => setOutboundCallerId(e.target.value)} className="w-full" variant="outlined" />
+        
+        {/* Second row - IP->PSTN Outbound Calls section */}
+        <div className="flex flex-wrap items-center gap-15 mb-4">
+          <div className="flex items-center justify-between gap-6 min-w-fit">
+            <span className="font-medium text-sm whitespace-nowrap">IP-&gt;PSTN Outbound Calls with Designated CallerID:</span>
+            <TextField size="small" value={outboundCallerId} onChange={e => setOutboundCallerId(e.target.value)} className="w-28" variant="outlined" />
           </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full max-w-xs">
-            <span className="font-medium text-base text-left whitespace-normal leading-tight break-words">IP-&gt;PSTN Designation Mode:</span>
-            <FormControl size="small" className="w-full">
+          <div className="flex items-center justify-between gap-6 min-w-fit">
+            <span className="font-medium text-sm whitespace-nowrap">IP-&gt;PSTN Designation Mode:</span>
+            <FormControl size="small" className="w-40">
               <Select value={designationMode} onChange={e => setDesignationMode(e.target.value)} variant="outlined">
                 <MenuItem value="SIP Side Reject">SIP Side Reject</MenuItem>
                 <MenuItem value="Other">Other</MenuItem>
               </Select>
             </FormControl>
           </div>
-          <Button
-            type="submit"
-            className="min-w-[90px] h-9 ml-0 sm:ml-2 bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white font-semibold rounded-md shadow hover:from-[#0e8fd6] hover:to-[#3bb6f5]"
-          >
-            <span className="text-white">Set</span>
-          </Button>
+          <div className="flex items-center gap-6">
+            <Button
+              type="submit"
+              className="min-w-[80px] h-9 bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white font-semibold rounded-md shadow hover:from-[#0e8fd6] hover:to-[#3bb6f5]"
+            >
+              <span className="text-white text-sm ">Set</span>
+            </Button>
+          </div>
         </div>
-        <div className="text-red-600 font-medium text-base text-center w-full mt-4">
+        
+        <div className="text-red-600 font-medium text-sm text-center w-full">
           Note: IP-&gt;PSTN Outbound Calls with Designated CallerID set to 0 means the feature is disabled; Usage Cycle set to 0 means not to clear counts.
         </div>
       </form>
       {/* Dual tables */}
-      <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto md:flex-row md:gap-4 md:justify-center">
+      <div className="flex flex-col gap-6 w-full mx-auto md:flex-row md:gap-3 md:justify-between">
         {renderTable(rowsIpPstn, checkedIpPstn, 'ip_pstn', 'IP->PSTN Manipulated CallerID Pool')}
         {renderTable(rowsPstnIp, checkedPstnIp, 'pstn_ip', 'PSTN->IP Manipulated CallerID Pool')}
       </div>

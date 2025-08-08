@@ -77,9 +77,7 @@ export const MANAGEMENT_SECTIONS = [
       { name: 'systemTime', label: 'System Time', type: 'text', initial: '' },
       { name: 'modifyTime', label: 'Modify', type: 'checkbox', initial: false },
       { name: 'timeZone', label: 'Time Zone', type: 'select', options: [
-        { value: 'GMT+5:30', label: 'GMT+5:30 (Madras, Calcutta, Mumbai, New Delhi)' },
-        { value: 'GMT+8:00', label: 'GMT+8:00 (Beijing, Hong Kong, Singapore)' },
-        { value: 'GMT+0:00', label: 'GMT+0:00 (London)' },
+          { value: 'GMT+5:30', label: 'GMT+5:30 (India)' },
       ], initial: 'GMT+5:30' },
     ]
   },

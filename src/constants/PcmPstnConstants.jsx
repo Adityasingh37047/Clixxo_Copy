@@ -1,17 +1,115 @@
+export const PCM_PSTN_SEARCH_FIELDS = [
+  { key: 'spanNo', label: 'SpanNO', type: 'text', placeholder: 'Please input SpanNO' },
+  { key: 'context', label: 'Context', type: 'select', options: ['Please select', 'Route1', 'Pstn-E1'] },
+  { key: 'signalling', label: 'Signalling', type: 'select', options: ['Please select', 'Signalling1', 'Signalling2'] },
+  { key: 'status', label: 'Status', type: 'select', options: ['Please select', 'Active', 'Inactive'] },
+];
+
+// PCM PSTN modal fields and initial state
 export const PCM_PSTN_FIELDS = [
-  { key: 'interface', label: 'Interface', type: 'select', options: ['E1', 'Other'] },
-  { key: 'encodingFormat', label: 'Encoding Format', type: 'select', options: ['A-law', 'Mu-law'] },
-  { key: 'echoCanceller', label: 'Echo Canceller', type: 'checkbox' },
-  { key: 'busyToneDetection', label: 'Busy Tone Detection', type: 'checkbox' },
-  { key: 'ringbackTone', label: 'Ringback Tone', type: 'select', options: ['No Ringback Tone', 'Option 1', 'Option 2'] },
-  { key: 'pstnCallBarring', label: 'PSTN Call Barring', type: 'checkbox' },
-  { key: 'isdnProgressIndicator', label: 'ISDN 01 Message Contains Progress Indicator', type: 'text' },
-  { key: 'ringbackToneVolume', label: 'Ringback Tone Volume (dB)', type: 'text' },
-  { key: 'pstnOutputLevelControlMode', label: 'PSTN side output Level Control Mode', type: 'select', options: ['Manual', 'Auto'] },
-  { key: 'voiceGainOutput', label: 'Voice Gain Output from PSTN (dB)', type: 'text' },
-  { key: 'uuiProtocolDiscriminator', label: 'UUI Protocol Discriminator', type: 'checkbox' },
-  { key: 'hotBackupE1', label: 'Hot Back-up for E1', type: 'checkbox' },
-  { key: 'limitedLengthCalleeId', label: 'Limited Length of E1 Outgoing CalleeID', type: 'text' },
-  { key: 'timeLimitOutgoingCalls', label: 'Time Limit for E1 Outgoing Calls per Month', type: 'checkbox' },
-  { key: 'pstnCallForwarding', label: 'PSTN Call Forwarding', type: 'select', options: ['Disable', 'Enable'] },
+  {
+    name: 'index',
+    label: 'Index',
+    type: 'select',
+    options: Array.from({ length: 1 }, (_, i) => ({ value: i, label: i.toString() })),
+  },
+  {
+    name: 'spanNo',
+    label: 'SpanNO',
+    type: 'text',
+    placeholder: 'Please input SpanNO',
+  },
+  {
+    name: 'context',
+    label: 'Context',
+    type: 'select',
+    options: ['Please select', 'Context1', 'Context2'],
+  },
+  {
+    name: 'framing',
+    label: 'Framing',
+    type: 'select',
+    options: ['Please select', 'ESF', 'D4', 'CRC4', 'NO-CRC4'],
+  },
+  {
+    name: 'coding',
+    label: 'Coding',
+    type: 'select',
+    options: ['Please select', 'HDB3', 'AMI', 'B8ZS'],
+  },
+  {
+    name: 'timeSrc',
+    label: 'TimeSrc',
+    type: 'select',
+    options: ['Please select', 'Internal', 'External', 'Recovery'],
+  },
+  {
+    name: 'signalling',
+    label: 'Signalling',
+    type: 'select',
+    options: ['Please select', 'Signalling1', 'Signalling2'],
+  },
+  {
+    name: 'group',
+    label: 'Group',
+    type: 'select',
+    options: ['Please select', 'Group1', 'Group2'],
+  },
+  {
+    name: 'priSwitchType',
+    label: 'PRI SwitchType',
+    type: 'select',
+    options: ['Please select', 'Type1', 'Type2', 'Type3'],
+  },
+  {
+    name: 'status',
+    label: 'Status',
+    type: 'select',
+    options: ['Please select', 'Active', 'Inactive'],
+  },
+];
+
+export const PCM_PSTN_INITIAL_FORM = {
+  index: 0,
+  spanNo: '',
+  context: '',
+  framing: '',
+  coding: '',
+  timeSrc: '',
+  signalling: '',
+  group: '',
+  priSwitchType: '',
+  status: '',
+};
+
+export const PCM_PSTN_TABLE_COLUMNS = [
+  { key: 'check', label: 'Check' },
+  { key: 'spanNo', label: 'SpanNO' },
+  { key: 'context', label: 'Context' },
+  { key: 'framing', label: 'Framing' },
+  { key: 'coding', label: 'Coding' },
+  { key: 'timeSrc', label: 'TimeSrc' },
+  { key: 'signalling', label: 'Signalling' },
+  { key: 'group', label: 'Group' },
+  { key: 'priSwitchType', label: 'PRI SwitchType' },
+  { key: 'status', label: 'Status' },
+  { key: 'operation', label: 'Operation' },
+];
+
+// Sample data for the PCM PSTN table
+export const SAMPLE_PCM_PSTN_DATA = [
+  // You can add sample data here if needed
+  // Example:
+  // {
+  //   spanNo: '1',
+  //   context: 'Route1',
+  //   framing: 'ESF',
+  //   coding: 'HDB3',
+  //   timeSrc: 'Internal',
+  //   signalling: 'Signalling1',
+  //   group: 'Group1',
+  //   priSwitchType: 'Type1',
+  //   status: 'Active',
+  //   operation: 'Edit',
+  // },
 ];

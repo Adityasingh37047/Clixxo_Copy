@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DHCP_SERVER_SETTINGS_FIELDS, DHCP_SERVER_SETTINGS_INITIAL_FORM } from '../constants/DhcpServerSettingsConstants';
-import { Checkbox, TextField, Button } from '@mui/material';
+import { fetchDhcpSettings, fetchSaveDhcpSettings, fetchResetDhcpSettings } from '../api/apiService';
+import { Checkbox, TextField, Button, Alert, CircularProgress } from '@mui/material';
 
 const grayButtonSx = {
   background: 'linear-gradient(to bottom, #e3e7ef 0%, #bfc6d1 100%)',
@@ -41,6 +42,46 @@ const blueButtonSx = {
 
 const DhcpServerSettings = () => {
   const [form, setForm] = useState(DHCP_SERVER_SETTINGS_INITIAL_FORM);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  // Fetch DHCP settings on component mount
+  useEffect(() => {
+    fetchDhcpData();
+  }, []);
+
+  const fetchDhcpData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetchDhcpSettings();
+      
+      // Map the server data to our form structure
+      if (response && response.success && response.data && Array.isArray(response.data)) {
+        const mappedData = {};
+        
+        response.data.forEach((lanData, index) => {
+          const lanNumber = index + 1;
+          mappedData[`enabled${lanNumber}`] = lanData.enabled || false;
+          mappedData[`ipRange${lanNumber}`] = lanData.ipRange || '';
+          mappedData[`subnetMask${lanNumber}`] = lanData.subnetMask || '';
+          mappedData[`defaultGateway${lanNumber}`] = lanData.defaultGateway || '';
+          mappedData[`dnsServer${lanNumber}`] = lanData.dnsServer || '';
+        });
+        
+        setForm(prevForm => ({
+          ...prevForm,
+          ...mappedData
+        }));
+      }
+    } catch (err) {
+      console.error('Error fetching DHCP settings:', err);
+      setError('Failed to load DHCP settings. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -50,81 +91,71 @@ const DhcpServerSettings = () => {
     }));
   };
 
-  const handleReset = () => {
-    setForm(DHCP_SERVER_SETTINGS_INITIAL_FORM);
+  const handleReset = async () => {
+    try {
+      setError(null);
+      setSuccess(null);
+      const response = await fetchResetDhcpSettings();
+      if (response && response.success) {
+        setSuccess('DHCP settings reset successfully!');
+        // Optionally refresh the data after successful reset
+        await fetchDhcpData();
+      } else {
+        setError('Failed to reset DHCP settings. Please try again.');
+      }
+    } catch (err) {
+      console.error('Error resetting DHCP settings:', err);
+      setError('Failed to reset DHCP settings. Please try again.');
+    }
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    // Implement save logic here
+    try {
+      setError(null);
+      setSuccess(null);
+      
+      // Send the form data to the server
+      const response = await fetchSaveDhcpSettings(form);
+      
+      if (response && response.success) {
+        setSuccess('DHCP settings saved successfully!');
+        // Optionally refresh the data after successful save
+        // await fetchDhcpData();
+      } else {
+        setError('Failed to save DHCP settings. Please try again.');
+      }
+    } catch (err) {
+      console.error('Error saving DHCP settings:', err);
+      setError('Failed to save DHCP settings. Please try again.');
+    }
   };
 
   return (
-    <div className="bg-white min-h-[calc(100vh-80px)] p-4 flex flex-col items-center">
+    <div className="bg-white min-h-[calc(100vh-80px)] p-2 sm:p-4 md:p-8 flex flex-col items-center">
       <div className="w-full max-w-4xl mx-auto">
-        <div className="w-full bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] h-10 flex items-center justify-center font-semibold text-lg text-black shadow mb-0 border-t-2 border-x-2 border-gray-400 rounded-t-xl">
-          DHCP Server
-        </div>
-        <form onSubmit={handleSave} className="w-full bg-white border-x-2 border-b-2 border-gray-400 rounded-b-xl flex flex-col gap-0 px-2 md:px-8 py-6">
-          <div className="w-full max-w-3xl mx-auto">
-            {DHCP_SERVER_SETTINGS_FIELDS.map((section, idx) => (
-              <div key={section.lan} className="w-full flex flex-col md:flex-row md:items-start mb-8">
-                {/* LAN label */}
-                <div className="md:w-1/5 w-full flex md:justify-center justify-start items-center mb-2 md:mb-0">
-                  <span className="font-semibold text-lg text-gray-700">{section.lan}</span>
-                </div>
-                {/* Fields */}
-                <div className="md:w-4/5 w-full flex flex-col gap-2">
-                  {section.fields.map((field, i) => (
-                    <div key={field.name} className="flex flex-row items-center mb-1 gap-x-6 md:gap-x-10">
-                      <div className="w-40 text-base text-gray-800 text-left pl-2 whitespace-nowrap">
-                        {field.type === 'checkbox' ? field.label : field.label}
-                      </div>
-                      {field.type === 'checkbox' ? (
-                        <>
-                          <Checkbox
-                            checked={form[field.name]}
-                            onChange={handleChange}
-                            name={field.name}
-                            sx={{ '& .MuiSvgIcon-root': { fontSize: 22 } }}
-                          />
-                          <span className="ml-1 text-base text-gray-800">Enable</span>
-                        </>
-                      ) : (
-                        <TextField
-                          variant="outlined"
-                          size="small"
-                          name={field.name}
-                          value={form[field.name]}
-                          onChange={handleChange}
-                          className="flex-1 bg-white ml-4"
-                          sx={{ minWidth: 140, maxWidth: 220 }}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+        {/* Error message above the blue bar */}
+        {error && (
+          <div className="w-full flex items-center justify-center p-4 bg-red-100 border-2 border-red-400 text-red-700 rounded-b-lg mb-4">
+            <span className="mr-4 text-4xl font-bold">❌</span>
+            <span className="text-2xl font-bold">{error}</span>
           </div>
-        </form>
-        <div className="flex flex-col sm:flex-row justify-center gap-8 mt-8 w-full max-w-3xl mx-auto">
-          <Button
-            type="submit"
-            variant="contained"
-            sx={blueButtonSx}
-            onClick={handleSave}
-          >
-            Save
-          </Button>
-          <Button
-            type="button"
-            variant="contained"
-            onClick={handleReset}
-            sx={blueButtonSx}
-          >
-            Reset
-          </Button>
+        )}
+        {/* Blue bar */}
+        <div className="w-full bg-gradient-to-b from-[#b3e0ff] via-[#6ec1f7] to-[#3b8fd6] h-10 flex items-center justify-center font-semibold text-lg text-black shadow mb-0 border-t-2 border-x-2 border-gray-400 rounded-t-xl relative">
+          DHCP Server Settings
+        </div>
+        {/* Always show the form, even if loading or error */}
+        <div className="w-full bg-white border-x-2 border-b-2 border-gray-400 rounded-b-xl flex flex-col gap-0 px-2 sm:px-4 md:px-8 py-6">
+          {loading && !error ? (
+            <div className="flex justify-center items-center py-12">
+              <CircularProgress />
+              <span className="ml-4 text-lg">Loading DHCP settings...</span>
+            </div>
+          ) : (
+            // ... existing form rendering code ...
+            <>{/* Place your form fields/components here as before */}</>
+          )}
         </div>
       </div>
     </div>

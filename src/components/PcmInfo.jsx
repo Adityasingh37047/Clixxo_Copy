@@ -88,7 +88,7 @@ const PcmInfo = () => {
       </div>
 
       {/* Main bordered box (no blue bar inside) */}
-      <div className="bg-white border border-gray-400 rounded-b-lg">
+      <div className="bg-white border-2 border-gray-400 rounded-b-lg">
         {/* Content Area */}
         <div className="bg-white p-4 md:p-6">
           <div className="space-y-3">

@@ -102,7 +102,21 @@ const IPCallInCallerID = () => {
   const [scrollState, setScrollState] = useState({ left: 0, width: 0, scrollWidth: 0 });
 
   const handleOpenModal = (item = null, index = -1) => {
-    setFormData(item ? { ...item, originalIndex: index } : IP_CALL_IN_CALLERID_INITIAL_FORM);
+    if (item) {
+      // Editing existing item
+      setFormData({ ...item, originalIndex: index });
+    } else {
+      // Adding new item - find the smallest unused index
+      const usedIndexes = rules.map(r => parseInt(r.index, 10));
+      let nextIndex = 1;
+      while (usedIndexes.includes(nextIndex)) {
+        nextIndex++;
+      }
+      setFormData({ 
+        ...IP_CALL_IN_CALLERID_INITIAL_FORM, 
+        index: nextIndex.toString() 
+      });
+    }
     setIsModalOpen(true);
   };
   const handleCloseModal = () => setIsModalOpen(false);
@@ -369,7 +383,29 @@ const IPCallInCallerID = () => {
               <div key={field.name} className="flex items-center bg-gray-50 border border-gray-200 rounded px-2 py-1 gap-2" style={{ minHeight: 32 }}>
                 <label className="text-[14px] text-gray-700 font-medium whitespace-nowrap text-left" style={{width:180, marginRight:10}}>{field.label}</label>
                 <div className="flex-1">
-                  {field.type === 'select' ? (
+                  {field.name === 'index' ? (
+                    <MuiSelect
+                      name="index"
+                      value={formData.index}
+                      onChange={handleInputChange}
+                      size="small"
+                      fullWidth
+                      variant="outlined"
+                      sx={{ fontSize: 14 }}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 200,
+                            overflow: 'auto'
+                          }
+                        }
+                      }}
+                    >
+                      {[...Array(500).keys()].map(i => (
+                        <MenuItem key={i+1} value={(i+1).toString()} sx={{ fontSize: 14 }}>{i+1}</MenuItem>
+                      ))}
+                    </MuiSelect>
+                  ) : field.type === 'select' ? (
                     <FormControl size="small" fullWidth>
                       <MuiSelect value={formData[field.name] || ''} onChange={e => handleInputChange({ target: { name: field.name, value: e.target.value } })} variant="outlined" sx={{ fontSize: 14 }}>
                         {field.options.map(opt => (

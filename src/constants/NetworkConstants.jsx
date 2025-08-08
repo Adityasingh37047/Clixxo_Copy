@@ -4,7 +4,6 @@ export const NETWORK_SETTINGS_FIELDS = [
     fields: [
       { name: 'ipv4Type1', label: 'IPV4 Network Type (M):', type: 'select', options: [
         { value: 'Static', label: 'Static' },
-        { value: 'DHCP', label: 'DHCP' },
       ] },
       { name: 'ipAddress1', label: 'IP Address (I):', type: 'text' },
       { name: 'subnetMask1', label: 'Subnet Mask (U):', type: 'text' },
@@ -18,7 +17,6 @@ export const NETWORK_SETTINGS_FIELDS = [
     fields: [
       { name: 'ipv4Type2', label: 'IPV4 Network Type (M):', type: 'select', options: [
         { value: 'Static', label: 'Static' },
-        { value: 'DHCP', label: 'DHCP' },
       ] },
       { name: 'ipAddress2', label: 'IP Address (I):', type: 'text' },
       { name: 'subnetMask2', label: 'Subnet Mask (U):', type: 'text' },

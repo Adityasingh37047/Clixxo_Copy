@@ -1,25 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import clixxoLogo from '../assets/Clixxo.png';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { fetchLogin } from '../api/apiService';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [serverStatus, setServerStatus] = useState('online'); // Default to online, will be checked during login
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, IP, PORT, METHOD } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!username.trim() || !password.trim()) {
+      setError('Please enter both username and password');
+      return;
+    }
+    
     setIsLoading(true);
     setError('');
+    setServerStatus('online'); // Reset server status
+    
     try {
       await login(username, password);
       navigate('/');
     } catch (err) {
-      setError('Wrong username or password');
+      console.error('Login error:', err);
+      
+      // Check if it's a network/server error
+      if (err.message.includes('Network Error') || err.message.includes('Failed to fetch')) {
+        setServerStatus('offline');
+        setError('Cannot connect to server. Please check your network connection.');
+      } else {
+        setError(err.message || 'Login failed. Please check your credentials.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -31,22 +50,54 @@ const LoginPage = () => {
     setError('');
   };
 
+
+  
   return (
     <div className="min-h-screen bg-[#e3e7ef] flex flex-col items-center justify-start">
       {/* Top Bar */}
-      <div className="w-screen h-[170px] bg-[#23272b] relative overflow-hidden" />
+      <div className="w-screen h-[170px] bg-[#23272b] relative overflow-hidden">
+        {/* Server Status in Top Bar */}
+        {serverStatus === 'offline' && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="bg-[#f8d7da] text-[#721c24] px-6 py-4 rounded-lg text-lg font-medium border border-[#f5c6cb] shadow-lg flex flex-col items-center">
+              <div className="flex items-center mb-3">
+                <span className="mr-3 text-xl">⚠️</span>
+                Server is offline. Please check your connection.
+              </div>
+              <button
+                onClick={() => setServerStatus('online')}
+                className="bg-[#721c24] text-white px-4 py-2 rounded-md hover:bg-[#5a1a1a] transition-colors"
+              >
+                Retry Connection
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+      
       {/* Login Card */}
       <div className="bg-white/80 rounded-lg shadow-lg px-6 py-10 sm:px-10 sm:py-12 flex flex-col items-center relative mt-6 w-[95vw] max-w-[400px]">
         {/* Error Message */}
         {error && (
           <div className="bg-[#f8d7da] text-[#a94442] px-5 py-3 rounded-md text-base font-medium mb-4 w-full max-w-xs absolute -top-16 left-1/2 -translate-x-1/2 border border-[#f5c6cb] flex items-center justify-between z-10 shadow">
-            <span>username or password is incorrect.</span>
+            <span className="flex items-center">
+              <span className="mr-2">❌</span>
+              {error}
+            </span>
             <span
               className="cursor-pointer text-2xl ml-4 leading-none"
               onClick={() => setError('')}
             >
               &times;
             </span>
+          </div>
+        )}
+        
+        {/* Loading Message */}
+        {isLoading && (
+          <div className="bg-[#d1ecf1] text-[#0c5460] px-5 py-3 rounded-md text-base font-medium mb-4 w-full max-w-xs absolute -top-16 left-1/2 -translate-x-1/2 border border-[#bee5eb] flex items-center justify-center z-10 shadow">
+            <span className="mr-2">⏳</span>
+            Connecting to server...
           </div>
         )}
         {/* Logo */}
@@ -63,8 +114,14 @@ const LoginPage = () => {
               value={username}
               onChange={e => setUsername(e.target.value)}
               className="text-base px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white disabled:bg-gray-100"
+              placeholder="Enter username"
               autoFocus
               disabled={isLoading}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && password) {
+                  handleLogin(e);
+                }
+              }}
             />
           </div>
           <div className="flex flex-col gap-2 mb-7">
@@ -75,20 +132,26 @@ const LoginPage = () => {
               value={password}
               onChange={e => setPassword(e.target.value)}
               className="text-base px-3 py-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white disabled:bg-gray-100"
+              placeholder="Enter password"
               disabled={isLoading}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && username && password) {
+                  handleLogin(e);
+                }
+              }}
             />
           </div>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || serverStatus === 'offline'}
               className={`min-w-[120px] px-8 py-2 text-lg rounded-md font-semibold shadow-md transition-all duration-200
-                ${isLoading
+                ${isLoading || serverStatus === 'offline'
                   ? 'bg-gray-300 text-white cursor-not-allowed'
                   : 'bg-gradient-to-b from-[#3bb6f5] to-[#0e8fd6] text-white hover:from-[#249be8] hover:to-[#0a6fae] hover:shadow-lg cursor-pointer'}
               `}
             >
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? 'Logging in...' : serverStatus === 'offline' ? 'Server Offline' : 'Login'}
             </button>
             <button
               type="button"

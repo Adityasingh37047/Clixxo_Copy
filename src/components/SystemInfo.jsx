@@ -12,21 +12,21 @@ const InfoRow = ({ label, values, isIndented = false }) => (
   <div
     className={`grid grid-cols-1 md:grid-cols-12 gap-4 text-sm ${isIndented ? "pl-6" : ""}`}
   >
-    <div className="md:col-span-3 font-medium text-gray-700">{label}</div>
+    <div className="md:col-span-3 font-medium text-gray-700 break-words">{label}</div>
     {Array.isArray(values) ? (
       values.map((value, idx) => (
-        <div key={idx} className="md:col-span-3 col-span-1">{value || ""}</div>
+        <div key={idx} className="md:col-span-3 col-span-1 break-words">{value || ""}</div>
       ))
     ) : (
-      <div className="md:col-span-9 col-span-1">{values}</div>
+      <div className="md:col-span-9 col-span-1 break-words">{values}</div>
     )}
   </div>
 );
 
 const LanSection = ({ name, data }) => (
-  <div className="p-4">
-    <h3 className="font-semibold text-gray-700 mb-3">{name}</h3>
-    <div className="space-y-2">
+  <div className="p-6 border-b border-gray-200">
+    <h3 className="font-semibold text-gray-700 mb-4 text-lg">{name}</h3>
+    <div className="space-y-3">
       {Object.entries(data).map(([key, value]) => (
         <InfoRow key={key} label={key} values={value} />
       ))}
@@ -73,7 +73,7 @@ else{
   },[]);
   return (
     <div className="bg-white min-h-[calc(100vh-80px)] p-2 sm:p-4 md:p-8 flex flex-col items-center">
-      <div className="w-full max-w-3xl">
+      <div className="w-full max-w-6xl">
         {/* Error message with icon */}
         {error && (
           <div className="flex items-center mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -84,7 +84,7 @@ else{
         <div className="w-full h-9 bg-gradient-to-b from-[#d0ecff] via-[#7ecbfa] to-[#3b8fd6] rounded-t-lg flex items-center justify-center font-semibold text-lg text-gray-800 shadow mb-0">
           System Info
         </div>
-        <div className="bg-white rounded-b-lg shadow-sm border border-gray-400">
+        <div className="bg-white rounded-b-lg shadow-sm border-2 border-gray-400">
           {LAN_INTERFACES.map((lan) => (
             <LanSection key={lan.name} name={lan.name} data={lan.data} />
           ))}

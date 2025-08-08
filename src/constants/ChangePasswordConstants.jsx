@@ -1,6 +1,6 @@
 // Field labels
 export const CHANGE_PASSWORD_FIELDS = [
-  { name: 'currentUsername', label: 'Current Username', type: 'text', disabled: true },
+  { name: 'currentUsername', label: 'Current Username', type: 'text' },
   { name: 'currentPassword', label: 'Current Password', type: 'password' },
   { name: 'newUsername', label: 'New Username', type: 'text' },
   { name: 'newPassword', label: 'New Password', type: 'password' },
@@ -9,8 +9,8 @@ export const CHANGE_PASSWORD_FIELDS = [
 
 // Initial form state
 export const CHANGE_PASSWORD_INITIAL_FORM = {
-  currentUsername: 'admin',
-  currentPassword: 'admin',
+  currentUsername: '',
+  currentPassword: '',
   newUsername: '',
   newPassword: '',
   confirmNewPassword: '',
